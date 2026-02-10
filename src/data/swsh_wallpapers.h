@@ -1,26 +1,26 @@
 enum {
-    SWSH_WALLPAPER_BASE,
-    SWSH_WALLPAPER_NORMAL,
-    SWSH_WALLPAPER_FIGHTING,
-    SWSH_WALLPAPER_FLYING,
-    SWSH_WALLPAPER_POISON,
-    SWSH_WALLPAPER_GROUND,
-    SWSH_WALLPAPER_ROCK,
-    SWSH_WALLPAPER_BUG,
-    SWSH_WALLPAPER_GHOST,
-    SWSH_WALLPAPER_STEEL,
-    SWSH_WALLPAPER_FIRE,
-    SWSH_WALLPAPER_WATER,
-    SWSH_WALLPAPER_GRASS,
-    SWSH_WALLPAPER_ELECTRIC,
-    SWSH_WALLPAPER_PSYCHIC,
-    SWSH_WALLPAPER_ICE,
-    SWSH_WALLPAPER_DRAGON,
-    SWSH_WALLPAPER_DARK,
-    SWSH_WALLPAPER_FAIRY,
-    SWSH_WALLPAPER_COUNT
+    WALLPAPER_BASE,
+    WALLPAPER_NORMAL,
+    WALLPAPER_FIGHTING,
+    WALLPAPER_FLYING,
+    WALLPAPER_POISON,
+    WALLPAPER_GROUND,
+    WALLPAPER_ROCK,
+    WALLPAPER_BUG,
+    WALLPAPER_GHOST,
+    WALLPAPER_STEEL,
+    WALLPAPER_FIRE,
+    WALLPAPER_WATER,
+    WALLPAPER_GRASS,
+    WALLPAPER_ELECTRIC,
+    WALLPAPER_PSYCHIC,
+    WALLPAPER_ICE,
+    WALLPAPER_DRAGON,
+    WALLPAPER_DARK,
+    WALLPAPER_FAIRY,
+    WALLPAPER_COUNT
 };
-// #define MAX_DEFAULT_WALLPAPER WALLPAPER_FLYING
+#define MAX_DEFAULT_WALLPAPER WALLPAPER_FLYING
 
 static const u32 sSwShStorage_Gfx[]           = INCBIN_U32("graphics/pokemon_storage/swsh/tiles.4bpp.smol");
 static const u16 sSwShStorage_Pal[]           = INCBIN_U16("graphics/pokemon_storage/swsh/tiles.gbapal");
@@ -30,10 +30,6 @@ static const u32 sSwShStorage_BG2_Tilemap[]   = INCBIN_U32("graphics/pokemon_sto
 static const u32 sWallpaperTiles_Base[]       = INCBIN_U32("graphics/pokemon_storage/swsh/wallpapers/base.4bpp.smol");
 static const u32 sWallpaperTilemap_Base[]     = INCBIN_U32("graphics/pokemon_storage/swsh/wallpapers/base.bin.smolTM");
 static const u16 sWallpaperPalette_Base[]     = INCBIN_U16("graphics/pokemon_storage/swsh/wallpapers/base.gbapal");
-
-static const u32 sWallpaperTiles_Box[]        = INCBIN_U32("graphics/pokemon_storage/swsh/wallpapers/box.4bpp.smol");
-static const u32 sWallpaperTilemap_Box[]      = INCBIN_U32("graphics/pokemon_storage/swsh/wallpapers/box.bin.smolTM");
-static const u16 sWallpaperPalette_Box[]      = INCBIN_U16("graphics/pokemon_storage/swsh/wallpapers/box.gbapal");
 
 static const u32 sWallpaperTiles_Normal[]     = INCBIN_U32("graphics/pokemon_storage/swsh/wallpapers/normal.4bpp.smol");
 static const u32 sWallpaperTilemap_Normal[]   = INCBIN_U32("graphics/pokemon_storage/swsh/wallpapers/normal.bin.smolTM");

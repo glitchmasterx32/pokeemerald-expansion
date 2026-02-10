@@ -16,6 +16,7 @@
 #include "item.h"
 #include "item_icon.h"
 #include "item_menu.h"
+#include "list_menu.h"
 #include "mail.h"
 #include "main.h"
 #include "menu.h"
@@ -141,27 +142,25 @@ enum {
     MENU_SWITCH,
     MENU_BAG,
     MENU_INFO,
-    MENU_SCENERY_1,
-    MENU_SCENERY_2,
-    MENU_SCENERY_3,
-    MENU_ETCETERA,
-    MENU_FRIENDS,
-    MENU_FOREST,
-    MENU_CITY,
-    MENU_DESERT,
-    MENU_SAVANNA,
-    MENU_CRAG,
-    MENU_VOLCANO,
-    MENU_SNOW,
-    MENU_CAVE,
-    MENU_BEACH,
-    MENU_SEAFLOOR,
-    MENU_RIVER,
-    MENU_SKY,
-    MENU_POLKADOT,
-    MENU_POKECENTER,
-    MENU_MACHINE,
-    MENU_SIMPLE,
+    MENU_BASE,
+    MENU_NORMAL,
+    MENU_FIGHTING,
+    MENU_FLYING,
+    MENU_POISON,
+    MENU_GROUND,
+    MENU_ROCK,
+    MENU_BUG,
+    MENU_GHOST,
+    MENU_STEEL,
+    MENU_FIRE,
+    MENU_WATER,
+    MENU_GRASS,
+    MENU_ELECTRIC,
+    MENU_PSYCHIC,
+    MENU_ICE,
+    MENU_DRAGON,
+    MENU_DARK,
+    MENU_FAIRY,
 };
 #define MENU_WALLPAPER_SETS_START MENU_SCENERY_1
 #define MENU_WALLPAPERS_START MENU_FOREST
@@ -247,6 +246,7 @@ enum {
     PALTAG_ITEM_ICON_1, // Used implicitly in CreateItemIconSprites
     PALTAG_ITEM_ICON_2, // Used implicitly in CreateItemIconSprites
     PALTAG_MARKING_MENU,
+    PALTAG_LIST_MENU_SCROLL_ARROW,
 };
 
 enum {
@@ -257,13 +257,12 @@ enum {
     GFXTAG_BOX_TITLE_FRAME,
     GFXTAG_BOX_TITLE_ARROW,
     GFXTAG_WAVEFORM,
-    GFXTAG_ARROW,
     GFXTAG_ITEM_ICON_0,
     GFXTAG_ITEM_ICON_1, // Used implicitly in CreateItemIconSprites
     GFXTAG_ITEM_ICON_2, // Used implicitly in CreateItemIconSprites
     GFXTAG_CHOOSE_BOX_MENU,
     GFXTAG_CHOOSE_BOX_MENU_SIDES, // Used implicitly in LoadChooseBoxMenuGfx
-    GFXTAG_12, // Unused
+    GFXTAG_LIST_MENU_ARROW,
     GFXTAG_MARKING_MENU,
     GFXTAG_14, // Unused
     GFXTAG_15, // Unused
@@ -456,7 +455,12 @@ struct PokemonStorageSystemData
     s8 iconScrollDirection; // Unnecessary duplicate of scrollDirection
     u8 iconScrollState;
     struct WindowTemplate menuWindow;
-    struct StorageMenu menuItems[7];
+    struct StorageMenu menuItems[20];
+    struct ListMenuTemplate listMenuTemplate;
+    u16 listMenuScrollRow;
+    u16 listMenuSelectedRow;
+    u8 listMenuTaskId;
+    u8 listMenuScrollArrowTaskId;
     u8 menuItemsCount;
     u8 menuWidth;
     u16 menuWindowId;
@@ -784,8 +788,8 @@ static void LoadWallpaperGfx(u8, s8);
 static bool32 WaitForWallpaperGfxLoad(void);
 static void DrawWallpaper(const void *, s8, u8);
 static void TrimOldWallpaper(void *);
-static void AddWallpaperSetsMenu(void);
-static void AddWallpapersMenu(u8);
+static void AddWallpaperMenu(void);
+
 static u8 GetBoxWallpaper(u8);
 static void SetBoxWallpaper(u8, u8);
 
@@ -1281,7 +1285,6 @@ static const union AffineAnimCmd *const sAffineAnims_ReleaseMon[] =
     [RELEASE_ANIM_CAME_BACK] = sAffineAnim_ReleaseMon_CameBack
 };
 
-#include "data/wallpapers.h"
 #include "data/swsh_wallpapers.h"
 
 static const u16 sUnusedColor = RGB(26, 29, 8);
@@ -1367,7 +1370,6 @@ static const struct CompressedSpriteSheet sSpriteSheet_BoxTitleArrow =
     .tag = GFXTAG_BOX_TITLE_ARROW,
 };
 
-
 static const struct SpriteTemplate sSpriteTemplate_BoxTitleArrow =
 {
     .tileTag = GFXTAG_BOX_TITLE_ARROW,
@@ -1377,43 +1379,6 @@ static const struct SpriteTemplate sSpriteTemplate_BoxTitleArrow =
     .images = NULL,
     .affineAnims = gDummySpriteAffineAnimTable,
     .callback = SpriteCB_Arrow,
-};
-
-
-static const struct OamData sOamData_Arrow =
-{
-    .shape = SPRITE_SHAPE(8x16),
-    .size = SPRITE_SIZE(8x16),
-    .priority = 1
-};
-
-static const union AnimCmd sAnim_Arrow_Left[] =
-{
-    ANIMCMD_FRAME(0, 5),
-    ANIMCMD_END
-};
-
-static const union AnimCmd sAnim_Arrow_Right[] =
-{
-    ANIMCMD_FRAME(2, 5),
-    ANIMCMD_END
-};
-
-static const union AnimCmd *const sAnims_Arrow[] =
-{
-    sAnim_Arrow_Left,
-    sAnim_Arrow_Right
-};
-
-static const struct SpriteTemplate sSpriteTemplate_Arrow =
-{
-    .tileTag = GFXTAG_ARROW,
-    .paletteTag = PALTAG_MISC_2,
-    .oam = &sOamData_Arrow,
-    .anims = sAnims_Arrow,
-    .images = NULL,
-    .affineAnims = gDummySpriteAffineAnimTable,
-    .callback = SpriteCB_Arrow
 };
 
 static const u16 sHandCursor_Pal[] = INCBIN_U16("graphics/pokemon_storage/hand_cursor.gbapal");
@@ -3535,84 +3500,43 @@ static void Task_HandleBoxOptions(u8 taskId)
 
 static void Task_HandleWallpapers(u8 taskId)
 {
+    s32 input;
+
     switch (sStorage->state)
     {
     case 0:
-        AddWallpaperSetsMenu();
-        PrintMessage(MSG_PICK_A_THEME);
+        sStorage->listMenuScrollRow = 0;
+        sStorage->listMenuSelectedRow = 0;
+        AddWallpaperMenu();
+        // PrintMessage(MSG_PICK_A_WALLPAPER);
         sStorage->state++;
         break;
     case 1:
-        if (!IsMenuLoading())
-             sStorage->state++;
-        break;
-    case 2:
-        sStorage->wallpaperSetId = HandleMenuInput();
-        switch (sStorage->wallpaperSetId)
+        // Input handling for list menu
+        input = ListMenu_ProcessInput(sStorage->listMenuTaskId);
+        ListMenuGetScrollAndRow(sStorage->listMenuTaskId, &sStorage->listMenuScrollRow, &sStorage->listMenuSelectedRow);
+        if (input != LIST_NOTHING_CHOSEN)
         {
-        case MENU_B_PRESSED:
-            AnimateBoxScrollArrows(TRUE);
-            ClearBottomWindow();
-            SetPokeStorageTask(Task_PokeStorageMain);
-            break;
-        case MENU_SCENERY_1:
-        case MENU_SCENERY_2:
-        case MENU_SCENERY_3:
-        case MENU_ETCETERA:
-            PlaySE(SE_SELECT);
-            RemoveMenu();
-            sStorage->wallpaperSetId -= MENU_WALLPAPER_SETS_START;
-            sStorage->state++;
-            break;
-        case MENU_FRIENDS:
-            // New wallpaper from Walda.
-            PlaySE(SE_SELECT);
-            sStorage->wallpaperId = WALLPAPER_FRIENDS;
-            RemoveMenu();
-            ClearBottomWindow();
-            sStorage->state = 6;
-            break;
-        }
-        break;
-    case 3:
-        if (!IsDma3ManagerBusyWithBgCopy())
-        {
-            AddWallpapersMenu(sStorage->wallpaperSetId);
-            PrintMessage(MSG_PICK_A_WALLPAPER);
-            sStorage->state++;
-        }
-        break;
-    case 4:
-        sStorage->wallpaperId = HandleMenuInput();
-        switch (sStorage->wallpaperId)
-        {
-        case MENU_NOTHING_CHOSEN:
-            break;
-        case MENU_B_PRESSED:
-            ClearBottomWindow();
-            sStorage->state = 0;
-            break;
-        default:
-            PlaySE(SE_SELECT);
-            ClearBottomWindow();
-            sStorage->wallpaperId -= MENU_WALLPAPERS_START;
-            SetWallpaperForCurrentBox(sStorage->wallpaperId);
-            sStorage->state++;
-            break;
-        }
-        break;
-    case 5:
-        if (!DoWallpaperGfxChange())
-        {
-            AnimateBoxScrollArrows(TRUE);
-            SetPokeStorageTask(Task_PokeStorageMain);
-        }
-        break;
-    case 6:
-        if (!IsDma3ManagerBusyWithBgCopy())
-        {
-            SetWallpaperForCurrentBox(sStorage->wallpaperId);
-            sStorage->state = 5;
+            if (input == LIST_CANCEL)
+            {
+                DestroyListMenuTask(sStorage->listMenuTaskId, &sStorage->listMenuScrollRow, &sStorage->listMenuSelectedRow);
+                RemoveScrollIndicatorArrowPair(sStorage->listMenuScrollArrowTaskId);
+                RemoveMenu();
+                ClearBottomWindow();
+                SetPokeStorageTask(Task_PokeStorageMain);
+            }
+            else
+            {
+                // input is the textId (MENU_BASE etc.)
+                PlaySE(SE_SELECT);
+                DestroyListMenuTask(sStorage->listMenuTaskId, &sStorage->listMenuScrollRow, &sStorage->listMenuSelectedRow);
+                RemoveScrollIndicatorArrowPair(sStorage->listMenuScrollArrowTaskId);
+                RemoveMenu();
+                sStorage->wallpaperId = input - MENU_BASE; // Convert to WALLPAPER_BASE...
+                SetWallpaperForCurrentBox(sStorage->wallpaperId);
+                ClearBottomWindow();
+                SetPokeStorageTask(Task_PokeStorageMain);
+            }
         }
         break;
     }
@@ -3640,7 +3564,6 @@ static void Task_JumpBox(u8 taskId)
             FreeChooseBoxMenu();
             if (sStorage->newCurrBoxId == BOXID_CANCELED || sStorage->newCurrBoxId == StorageGetCurrentBox())
             {
-                AnimateBoxScrollArrows(TRUE);
                 SetPokeStorageTask(Task_PokeStorageMain);
             }
             else
@@ -3946,9 +3869,9 @@ static void FreePokeStorageData(void)
 static void SetScrollingBackground(void)
 {
     SetGpuReg(REG_OFFSET_BG3CNT, BGCNT_PRIORITY(3) | BGCNT_CHARBASE(3) | BGCNT_16COLOR | BGCNT_SCREENBASE(31));
-    DecompressAndLoadBgGfxUsingHeap(3, sWallpaperTiles_Box, 0, 0, 0);
-    DecompressDataWithHeaderVram(sWallpaperTilemap_Box, (void *)BG_SCREEN_ADDR(31));
-    LoadPalette(sWallpaperPalette_Box, BG_PLTT_ID(1), PLTT_SIZE_4BPP);
+    DecompressAndLoadBgGfxUsingHeap(3, sWallpaperTiles_Base, 0, 0, 0);
+    DecompressDataWithHeaderVram(sWallpaperTilemap_Base, (void *)BG_SCREEN_ADDR(31));
+    LoadPalette(sWallpaperPalette_Base, BG_PLTT_ID(1), PLTT_SIZE_4BPP);
     // TODO: Load incoming BG3 palette into BG_PLTT_ID(2) for scrolling transitions
 }
 
@@ -4423,49 +4346,60 @@ static void ClearBottomWindow(void)
     ScheduleBgCopyTilemapToVram(0);
 }
 
-static void AddWallpaperSetsMenu(void)
+static void AddWallpaperMenu(void)
 {
-    InitMenu();
-    SetMenuText(MENU_SCENERY_1);
-    SetMenuText(MENU_SCENERY_2);
-    SetMenuText(MENU_SCENERY_3);
-    SetMenuText(MENU_ETCETERA);
-    if (IsWaldaWallpaperUnlocked())
-        SetMenuText(MENU_FRIENDS);
-    AddMenu();
-}
+    u16 i;
 
-static void AddWallpapersMenu(u8 wallpaperSet)
-{
     InitMenu();
-    switch (wallpaperSet)
+    for (i = MENU_BASE; i <= MENU_FAIRY; i++)
     {
-    case MENU_SCENERY_1 - MENU_WALLPAPER_SETS_START:
-        SetMenuText(MENU_FOREST);
-        SetMenuText(MENU_CITY);
-        SetMenuText(MENU_DESERT);
-        SetMenuText(MENU_SAVANNA);
-        break;
-    case MENU_SCENERY_2 - MENU_WALLPAPER_SETS_START:
-        SetMenuText(MENU_CRAG);
-        SetMenuText(MENU_VOLCANO);
-        SetMenuText(MENU_SNOW);
-        SetMenuText(MENU_CAVE);
-        break;
-    case MENU_SCENERY_3 - MENU_WALLPAPER_SETS_START:
-        SetMenuText(MENU_BEACH);
-        SetMenuText(MENU_SEAFLOOR);
-        SetMenuText(MENU_RIVER);
-        SetMenuText(MENU_SKY);
-        break;
-    case MENU_ETCETERA - MENU_WALLPAPER_SETS_START:
-        SetMenuText(MENU_POLKADOT);
-        SetMenuText(MENU_POKECENTER);
-        SetMenuText(MENU_MACHINE);
-        SetMenuText(MENU_SIMPLE);
-        break;
+        SetMenuText(i);
     }
-    AddMenu();
+    // ensure list termination
+    sStorage->menuItems[sStorage->menuItemsCount].text = NULL;
+    sStorage->menuItems[sStorage->menuItemsCount].textId = 0;
+
+    // Calculate snug width in tiles: (Cursor Space + Text + Right Padding + 7) / 8
+    sStorage->menuWindow.width = (8 + sStorage->menuWidth + 8 + 7) / 8;
+    if (sStorage->menuWindow.width > 28)
+        sStorage->menuWindow.width = 28;
+
+    sStorage->menuWindow.height = 10;
+    sStorage->menuWindow.tilemapLeft = 29 - sStorage->menuWindow.width;
+    sStorage->menuWindow.tilemapTop = 5;
+    sStorage->menuWindowId = AddWindow(&sStorage->menuWindow);
+    DrawStdFrameWithCustomTileAndPalette(sStorage->menuWindowId, FALSE, 2, 14);
+
+    sStorage->listMenuTemplate.items = (struct ListMenuItem *)sStorage->menuItems;
+    sStorage->listMenuTemplate.moveCursorFunc = ListMenuDefaultCursorMoveFunc;
+    sStorage->listMenuTemplate.itemPrintFunc = NULL;
+    sStorage->listMenuTemplate.totalItems = sStorage->menuItemsCount;
+    sStorage->listMenuTemplate.maxShowed = 5;
+    sStorage->listMenuTemplate.windowId = sStorage->menuWindowId;
+    sStorage->listMenuTemplate.header_X = 0;
+    sStorage->listMenuTemplate.item_X = 8;
+    sStorage->listMenuTemplate.cursor_X = 0;
+    sStorage->listMenuTemplate.upText_Y = 1;
+    sStorage->listMenuTemplate.cursorPal = 2;
+    sStorage->listMenuTemplate.fillValue = 1;
+    sStorage->listMenuTemplate.cursorShadowPal = 3;
+    sStorage->listMenuTemplate.lettersSpacing = 1;
+    sStorage->listMenuTemplate.itemVerticalPadding = 0;
+    sStorage->listMenuTemplate.scrollMultiple = LIST_NO_MULTIPLE_SCROLL;
+    sStorage->listMenuTemplate.fontId = FONT_NORMAL;
+    sStorage->listMenuTemplate.cursorKind = 0;
+
+    sStorage->listMenuTaskId = ListMenuInit(&sStorage->listMenuTemplate, sStorage->listMenuScrollRow, sStorage->listMenuSelectedRow);
+    sStorage->listMenuScrollArrowTaskId = AddScrollIndicatorArrowPairParameterized(
+        SCROLL_ARROW_UP,
+        (sStorage->menuWindow.tilemapLeft + sStorage->menuWindow.width / 2) * 8, // Center X
+        sStorage->menuWindow.tilemapTop * 8 - 4, // Top Y
+        (sStorage->menuWindow.tilemapTop + sStorage->menuWindow.height) * 8 + 4, // Bottom Y
+        sStorage->menuItemsCount - sStorage->listMenuTemplate.maxShowed,
+        GFXTAG_LIST_MENU_ARROW,
+        PALTAG_LIST_MENU_SCROLL_ARROW,
+        &sStorage->listMenuScrollRow
+    );
 }
 
 static u8 GetCurrentBoxOption(void)
@@ -5968,7 +5902,7 @@ static void SpriteCB_Arrow(struct Sprite *sprite)
 // Arrows for Deposit/Jump Box selection
 static struct Sprite *CreateChooseBoxArrows(u16 x, u16 y, u8 animId, u8 priority, u8 subpriority)
 {
-    u8 spriteId = CreateSprite(&sSpriteTemplate_Arrow, x, y, subpriority);
+    u8 spriteId = CreateSprite(&sSpriteTemplate_BoxTitleArrow, x, y, subpriority);
     if (spriteId == MAX_SPRITES)
         return NULL;
 
@@ -8232,27 +8166,25 @@ static const u8 *const sMenuTexts[] =
     [MENU_SWITCH]     = COMPOUND_STRING("SWITCH"),
     [MENU_BAG]        = COMPOUND_STRING("BAG"),
     [MENU_INFO]       = COMPOUND_STRING("INFO"),
-    [MENU_SCENERY_1]  = COMPOUND_STRING("SCENERY 1"),
-    [MENU_SCENERY_2]  = COMPOUND_STRING("SCENERY 2"),
-    [MENU_SCENERY_3]  = COMPOUND_STRING("SCENERY 3"),
-    [MENU_ETCETERA]   = COMPOUND_STRING("ETCETERA"),
-    [MENU_FRIENDS]    = COMPOUND_STRING("FRIENDS"),
-    [MENU_FOREST]     = COMPOUND_STRING("FOREST"),
-    [MENU_CITY]       = COMPOUND_STRING("CITY"),
-    [MENU_DESERT]     = COMPOUND_STRING("DESERT"),
-    [MENU_SAVANNA]    = COMPOUND_STRING("SAVANNA"),
-    [MENU_CRAG]       = COMPOUND_STRING("CRAG"),
-    [MENU_VOLCANO]    = COMPOUND_STRING("VOLCANO"),
-    [MENU_SNOW]       = COMPOUND_STRING("SNOW"),
-    [MENU_CAVE]       = COMPOUND_STRING("CAVE"),
-    [MENU_BEACH]      = COMPOUND_STRING("BEACH"),
-    [MENU_SEAFLOOR]   = COMPOUND_STRING("SEAFLOOR"),
-    [MENU_RIVER]      = COMPOUND_STRING("RIVER"),
-    [MENU_SKY]        = COMPOUND_STRING("SKY"),
-    [MENU_POLKADOT]   = COMPOUND_STRING("POLKA-DOT"),
-    [MENU_POKECENTER] = COMPOUND_STRING("POKéCENTER"),
-    [MENU_MACHINE]    = COMPOUND_STRING("MACHINE"),
-    [MENU_SIMPLE]     = COMPOUND_STRING("SIMPLE"),
+    [MENU_BASE]       = COMPOUND_STRING("Default"),
+    [MENU_NORMAL]     = COMPOUND_STRING("Normal"),
+    [MENU_FIGHTING]   = COMPOUND_STRING("Fighting"),
+    [MENU_FLYING]     = COMPOUND_STRING("Flying"),
+    [MENU_POISON]     = COMPOUND_STRING("Poison"),
+    [MENU_GROUND]     = COMPOUND_STRING("Ground"),
+    [MENU_ROCK]       = COMPOUND_STRING("Rock"),
+    [MENU_BUG]        = COMPOUND_STRING("Bug"),
+    [MENU_GHOST]      = COMPOUND_STRING("Ghost"),
+    [MENU_STEEL]      = COMPOUND_STRING("Steel"),
+    [MENU_FIRE]       = COMPOUND_STRING("Fire"),
+    [MENU_WATER]      = COMPOUND_STRING("Water"),
+    [MENU_GRASS]      = COMPOUND_STRING("Grass"),
+    [MENU_ELECTRIC]   = COMPOUND_STRING("Electric"),
+    [MENU_PSYCHIC]    = COMPOUND_STRING("Psychic"),
+    [MENU_ICE]        = COMPOUND_STRING("Ice"),
+    [MENU_DRAGON]     = COMPOUND_STRING("Dragon"),
+    [MENU_DARK]       = COMPOUND_STRING("Dark"),
+    [MENU_FAIRY]      = COMPOUND_STRING("Fairy"),
 };
 
 static void SetMenuText(u8 textId)
@@ -8264,7 +8196,7 @@ static void SetMenuText(u8 textId)
 
         menu->text = sMenuTexts[textId];
         menu->textId = textId;
-        len = StringLength(menu->text);
+        len = GetStringWidth(FONT_NORMAL, menu->text, 0);
         if (len > sStorage->menuWidth)
             sStorage->menuWidth = len;
 
@@ -8282,7 +8214,10 @@ static s8 GetMenuItemTextId(u8 menuIdx)
 
 static void AddMenu(void)
 {
-    sStorage->menuWindow.width = sStorage->menuWidth + 2;
+    sStorage->menuWindow.width = (sStorage->menuWidth + 7) / 8 + 2;
+    if (sStorage->menuWindow.width > 28)
+        sStorage->menuWindow.width = 28;
+
     sStorage->menuWindow.height = 2 * sStorage->menuItemsCount;
     sStorage->menuWindow.tilemapLeft = 29 - sStorage->menuWindow.width;
     sStorage->menuWindow.tilemapTop = 15 - sStorage->menuWindow.height;
@@ -9824,7 +9759,7 @@ static u8 GetBoxWallpaper(u8 boxId)
     //     return gPokemonStoragePtr->boxWallpapers[boxId];
     // else
     //     return 0;
-    return WALLPAPER_FOREST;
+    return WALLPAPER_BASE;
 }
 
 static void SetBoxWallpaper(u8 boxId, u8 wallpaperId)
@@ -9832,7 +9767,7 @@ static void SetBoxWallpaper(u8 boxId, u8 wallpaperId)
     // if (boxId < TOTAL_BOXES_COUNT && wallpaperId < WALLPAPER_COUNT)
     //     gPokemonStoragePtr->boxWallpapers[boxId] = wallpaperId;
     if (boxId < TOTAL_BOXES_COUNT)
-        gPokemonStoragePtr->boxWallpapers[boxId] = WALLPAPER_FOREST;
+        gPokemonStoragePtr->boxWallpapers[boxId] = WALLPAPER_BASE;
 }
 
 // For moving to the next Pokémon while viewing the summary screen
@@ -9951,6 +9886,8 @@ bool32 AnyStorageMonWithMove(u16 move)
 
 //------------------------------------------------------------------------------
 //  SECTION: Walda
+//  Note: Walda wallpaper is not supported. The functions are kept to maintain
+//  compatibility and integration.
 //------------------------------------------------------------------------------
 
 
@@ -9981,7 +9918,7 @@ u32 GetWaldaWallpaperPatternId(void)
 
 void SetWaldaWallpaperPatternId(u8 id)
 {
-    if (id < ARRAY_COUNT(sWaldaWallpapers))
+    // if (id < ARRAY_COUNT(sWaldaWallpapers))
         gSaveBlock1Ptr->waldaPhrase.patternId = id;
 }
 
@@ -9992,7 +9929,7 @@ u32 GetWaldaWallpaperIconId(void)
 
 void SetWaldaWallpaperIconId(u8 id)
 {
-    if (id < ARRAY_COUNT(sWaldaWallpaperIcons))
+    // if (id < ARRAY_COUNT(sWaldaWallpaperIcons))
         gSaveBlock1Ptr->waldaPhrase.iconId = id;
 }
 
