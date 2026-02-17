@@ -27,8 +27,7 @@ static const u16 sSwShStorage_Pal[]           = INCBIN_U16("graphics/pokemon_sto
 static const u32 sSwShStorage_BG1_Tilemap[]   = INCBIN_U32("graphics/pokemon_storage/swsh/bg1.bin.smolTM");
 static const u32 sSwShStorage_BG2_Tilemap[]   = INCBIN_U32("graphics/pokemon_storage/swsh/bg2.bin.smolTM");
 static const u32 sMonInfo_Gfx[]               = INCBIN_U32("graphics/pokemon_storage/swsh/mon_info.4bpp.smol");
-static const u32 sMonInfo_Left_Tilemap[]      = INCBIN_U32("graphics/pokemon_storage/swsh/mon_info_left.bin.smolTM");
-static const u32 sMonInfo_Right_Tilemap[]     = INCBIN_U32("graphics/pokemon_storage/swsh/mon_info_right.bin.smolTM");
+static const u32 sMonInfo_Tilemap[]           = INCBIN_U32("graphics/pokemon_storage/swsh/mon_info.bin.smolTM");
 
 static const u32 sWallpaperTiles_Base[]       = INCBIN_U32("graphics/pokemon_storage/swsh/wallpapers/base.4bpp.smol");
 static const u32 sWallpaperTilemap_Base[]     = INCBIN_U32("graphics/pokemon_storage/swsh/wallpapers/base.bin.smolTM");
