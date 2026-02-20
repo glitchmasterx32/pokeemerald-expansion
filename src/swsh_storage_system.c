@@ -642,7 +642,6 @@ static void CompactPartySprites(void);
 static u8 GetNumPartySpritesCompacting(void);
 static void MovePartySpriteToNextSlot(struct Sprite *, u16);
 static void SpriteCB_MovePartyMonToNextSlot(struct Sprite *);
-static void DestroyAllPartyMonIcons(void);
 static void ReshowReleaseMon(void);
 static bool8 ResetReleaseMonSpritePtr(void);
 static void SetMovingMonPriority(u8);
@@ -4864,20 +4863,6 @@ static void DestroyPartyMonIcon(u8 partyId)
     }
 }
 
-static void DestroyAllPartyMonIcons(void)
-{
-    u16 i;
-
-    for (i = 0; i < PARTY_SIZE; i++)
-    {
-        if (sStorage->partySprites[i] != NULL)
-        {
-            DestroyBoxMonIcon(sStorage->partySprites[i]);
-            sStorage->partySprites[i] = NULL;
-        }
-    }
-}
-
 static void SetPartyMonIconObjMode(u8 partyId, u8 objMode)
 {
     if (sStorage->partySprites[partyId] != NULL)
@@ -6233,8 +6218,6 @@ static void PlaceMon(void)
     case CURSOR_AREA_IN_PARTY:
         SetPlacedMonData(TOTAL_BOXES_COUNT, sCursorPosition);
         SetPlacedMonSprite(TOTAL_BOXES_COUNT, sCursorPosition);
-        struct Pokemon *mon = &gPlayerParty[sCursorPosition];
-        UpdateSpeciesSpritePSS(&mon->box);
         break;
     case CURSOR_AREA_IN_BOX:
         boxId = StorageGetCurrentBox();
@@ -9739,8 +9722,19 @@ void UpdateSpeciesSpritePSS(struct BoxPokemon *boxMon)
         // Recreate icon sprite
         if (sCursorArea == CURSOR_AREA_IN_PARTY)
         {
-            DestroyAllPartyMonIcons();
-            CreatePartyMonsSprites(TRUE);
+            if (sStorage->partySprites[sCursorPosition] != NULL)
+            {
+                DestroyBoxMonIcon(sStorage->partySprites[sCursorPosition]);
+                sStorage->partySprites[sCursorPosition] = NULL;
+            }
+            species = GetMonData(&gPlayerParty[sCursorPosition], MON_DATA_SPECIES_OR_EGG);
+            if (species != SPECIES_NONE)
+            {
+                u32 personality = GetMonData(&gPlayerParty[sCursorPosition], MON_DATA_PERSONALITY);
+                sStorage->partySprites[sCursorPosition] = CreateMonIconSprite(species, personality, 40, 24 * sCursorPosition + 16, 1, 12);
+                if (sStorage->boxOption == OPTION_MOVE_ITEMS && GetMonData(&gPlayerParty[sCursorPosition], MON_DATA_HELD_ITEM) == ITEM_NONE)
+                    sStorage->partySprites[sCursorPosition]->oam.objMode = ST_OAM_OBJ_BLEND;
+            }
         }
         else
         {
