@@ -234,7 +234,6 @@ enum {
     PALTAG_MON_ICON_3, // Used implicitly in CreateMonIconSprite
     PALTAG_MON_ICON_4, // Used implicitly in CreateMonIconSprite
     PALTAG_MON_ICON_5, // Used implicitly in CreateMonIconSprite
-    PALTAG_DISPLAY_MON,
     PALTAG_MISC_1,
     PALTAG_MISC_2,
     PALTAG_MISC_3,
@@ -253,7 +252,6 @@ enum {
     GFXTAG_TYPE_ICON,
     GFXTAG_SHINY_ICON,
     GFXTAG_STAT_LABELS,
-    GFXTAG_DISPLAY_MON,
     GFXTAG_BOX_TITLE,
     GFXTAG_BOX_TITLE_FRAME,
     GFXTAG_BOX_TITLE_ARROW,
@@ -562,9 +560,6 @@ struct PokemonStorageSystemData
     struct ItemIcon itemIcons[MAX_ITEM_ICONS];
     u16 movingItemId;
     u16 itemInfoWindowOffset;
-    u16 displayMonPalOffset;
-    u16 *displayMonTilePtr;
-    struct Sprite *displayMonSprite;
     struct Sprite *genderIconSprite;
     struct Sprite *typeIconSprites[2];
     struct Sprite *shinyIconSprite;
@@ -579,6 +574,7 @@ struct PokemonStorageSystemData
     bool8 showMonInfo;
     u8 monInfoTilemapId;
     u8 displayMonInfoLoadState;
+    u8 graphicsLoadState;
 };
 
 #include "data/swsh_wallpapers.h"
@@ -865,9 +861,8 @@ static void InitPokeStorageBg0(void);
 static void SetScrollingBackground(void);
 static void UpdateBoxToSendMons(void);
 static void InitCursorItemIcon(void);
-static void InitPalettesAndSprites(void);
+static bool8 InitPalettesAndSprites(void);
 static void RefreshDisplayMonData(void);
-static void CreateDisplayMonSprite(void);
 static void CreateMarkingComboSprite(void);
 static void UpdateMarkingComboSprite(void);
 static void ClearBottomWindow(void);
@@ -893,16 +888,12 @@ static void FreePokeStorageData(void);
 // static void UpdatePartySlotColors(void);
 static void StartFlashingCloseBoxButton(void);
 static void SetUpDoShowPartyMenu(void);
-static void StartDisplayMonMosaicEffect(void);
 static bool8 InitPokeStorageWindows(void);
 static bool8 DoShowPartyMenu(void);
 static bool8 HidePartyMenu(void);
-static bool8 IsDisplayMosaicActive(void);
 static void ShowYesNoWindow(s8);
 static void UpdateCloseBoxButtonTilemap(bool8);
 static void PrintMessage(u8 id);
-static void LoadDisplayMonGfx(u16, u32);
-static void SpriteCB_DisplayMonMosaic(struct Sprite *);
 // static void SetPartySlotTilemap(u8, bool8);
 
 // Tilemap utility
@@ -1260,18 +1251,6 @@ static const struct SpriteTemplate sSpriteTemplate_BoxTitleFrame =
     .callback = SpriteCallbackDummy,
 };
 
-static const struct OamData sOamData_DisplayMon;
-static const struct SpriteTemplate sSpriteTemplate_DisplayMon =
-{
-    .tileTag = GFXTAG_DISPLAY_MON,
-    .paletteTag = PALTAG_DISPLAY_MON,
-    .oam = &sOamData_DisplayMon,
-    .anims = gDummySpriteAnimTable,
-    .images = NULL,
-    .affineAnims = gDummySpriteAffineAnimTable,
-    .callback = SpriteCallbackDummy,
-};
-
 static const u8 gText_PkmnIsSelected[] = _("{DYNAMIC 0} is selected.");
 
 static const struct StorageMessage sMessages[] =
@@ -1316,23 +1295,6 @@ static const struct WindowTemplate sYesNoWindowTemplate =
     .height = 4,
     .paletteNum = 15,
     .baseBlock = 0x5C,
-};
-
-static const struct OamData sOamData_DisplayMon =
-{
-    .y = 0,
-    .affineMode = ST_OAM_AFFINE_OFF,
-    .objMode = ST_OAM_OBJ_NORMAL,
-    .mosaic = FALSE,
-    .bpp = ST_OAM_4BPP,
-    .shape = SPRITE_SHAPE(64x64),
-    .x = 0,
-    .matrixNum = 0,
-    .size = SPRITE_SIZE(64x64),
-    .tileNum = 0,
-    .priority = 0,
-    .paletteNum = 0,
-    .affineParam = 0
 };
 
 static const struct OamData sOamData_MonIcon;
@@ -1481,7 +1443,7 @@ static const struct CompressedSpriteSheet sSpriteSheet_Cursor[] =
 {
     {
         .data = sCursor_Gfx,
-        .size = (32 * 32 * 3) / 2,
+        .size = (16 * 16 * 3) / 2,
         .tag = GFXTAG_CURSOR,
     },
     {},
@@ -1506,22 +1468,22 @@ static const struct SpritePalette sSpritePal_Cursor[] =
 
 static const struct OamData sOamData_Cursor =
 {
-    .shape = SPRITE_SHAPE(32x32),
-    .size = SPRITE_SIZE(32x32),
+    .shape = SPRITE_SHAPE(16x16),
+    .size = SPRITE_SIZE(16x16),
     .priority = 1,
 };
 
 static const union AnimCmd sAnim_Cursor_Bouncing[] =
 {
     ANIMCMD_FRAME(0, 8),
-    ANIMCMD_FRAME(16, 8),
-    ANIMCMD_FRAME(32, 8),
-    ANIMCMD_FRAME(16, 8),
+    ANIMCMD_FRAME(4, 8),
+    ANIMCMD_FRAME(8, 8),
+    ANIMCMD_FRAME(4, 8),
     ANIMCMD_JUMP(0)
 };
 static const union AnimCmd sAnim_Cursor_Main[] =
 {
-    ANIMCMD_FRAME(16, 5),
+    ANIMCMD_FRAME(4, 0),
     ANIMCMD_END
 };
 
@@ -2565,15 +2527,22 @@ static void Task_InitPokeStorage(u8 taskId)
         }
         break;
     case 6:
-        InitPalettesAndSprites();
+        if (!InitPalettesAndSprites())
+            return;
         break;
     case 7:
-        InitSupplementalTilemaps();
+        CreateCursorSprites();
+        // NOTE: Disabled old info panel sprites
+        // CreateDisplayMonSprite();
+        RefreshDisplayMonData();
         break;
     case 8:
-        CreateInitBoxTask(StorageGetCurrentBox());
+        InitSupplementalTilemaps();
         break;
     case 9:
+        CreateInitBoxTask(StorageGetCurrentBox());
+        break;
+    case 10:
         if (IsInitBoxActive())
             return;
 
@@ -2590,10 +2559,10 @@ static void Task_InitPokeStorage(u8 taskId)
             InitCursorItemIcon();
         }
         break;
-    case 10:
+    case 11:
         // Alpha blend BG2 with BG3
         SetGpuReg(REG_OFFSET_BLDCNT, BLDCNT_TGT1_BG2 | BLDCNT_EFFECT_BLEND | BLDCNT_TGT2_BG3);
-        SetGpuReg(REG_OFFSET_BLDALPHA, BLDALPHA_BLEND(10, 6));
+        SetGpuReg(REG_OFFSET_BLDALPHA, BLDALPHA_BLEND(12, 4));
         SetMonIconTransparency();
         if (!sStorage->isReopening)
         {
@@ -2883,7 +2852,7 @@ static void Task_PokeStorageMain(u8 taskId)
             {
                 UpdateMonInfoTilemap();
                 if (sStorage->setMosaic)
-                    StartDisplayMonMosaicEffect();
+                    RefreshDisplayMonData();
                 sStorage->state = MSTATE_HANDLE_INPUT;
             }
         }
@@ -2891,7 +2860,7 @@ static void Task_PokeStorageMain(u8 taskId)
     case MSTATE_HIDE_PANEL_SPRITES:
         UpdateMonInfoTilemap();
         if (sStorage->setMosaic)
-            StartDisplayMonMosaicEffect();
+            RefreshDisplayMonData();
         sStorage->state = MSTATE_HANDLE_INPUT;
         break;
     case MSTATE_SCROLL_BOX:
@@ -2901,7 +2870,7 @@ static void Task_PokeStorageMain(u8 taskId)
             if (!sInPartyMenu && !IsMonBeingMoved())
             {
                 RefreshDisplayMon();
-                StartDisplayMonMosaicEffect();
+                RefreshDisplayMonData();
             }
 
             if (sStorage->boxOption == OPTION_MOVE_ITEMS)
@@ -2956,7 +2925,7 @@ static void Task_PokeStorageMain(u8 taskId)
         if (!MultiMove_RunFunction())
         {
             if (sStorage->setMosaic)
-                StartDisplayMonMosaicEffect();
+                RefreshDisplayMonData();
             sStorage->state = MSTATE_HANDLE_INPUT;
         }
         break;
@@ -3010,7 +2979,7 @@ static void Task_HidePartyPokemon(u8 taskId)
         {
             UpdateMonInfoTilemap();
             if (sStorage->setMosaic)
-                StartDisplayMonMosaicEffect();
+                RefreshDisplayMonData();
             SetPokeStorageTask(Task_PokeStorageMain);
         }
         break;
@@ -3022,19 +2991,16 @@ static void Task_OnSelectedMon(u8 taskId)
     switch (sStorage->state)
     {
     case 0:
-        if (!IsDisplayMosaicActive())
-        {
-            PlaySE(SE_SELECT);
-            if (sStorage->boxOption != OPTION_MOVE_ITEMS)
-                PrintMessage(MSG_IS_SELECTED);
-            else if (IsMovingItem() || sStorage->displayMon.heldItem != ITEM_NONE)
-                PrintMessage(MSG_IS_SELECTED2);
-            else
-                PrintMessage(MSG_GIVE_TO_MON);
+        PlaySE(SE_SELECT);
+        if (sStorage->boxOption != OPTION_MOVE_ITEMS)
+            PrintMessage(MSG_IS_SELECTED);
+        else if (IsMovingItem() || sStorage->displayMon.heldItem != ITEM_NONE)
+            PrintMessage(MSG_IS_SELECTED2);
+        else
+            PrintMessage(MSG_GIVE_TO_MON);
 
-            AddMenu();
-            sStorage->state = 1;
-        }
+        AddMenu();
+        sStorage->state = 1;
         break;
     case 1:
         if (!IsMenuLoading())
@@ -3232,7 +3198,7 @@ static void Task_ShiftMon(u8 taskId)
     case 1:
         if (!DoMonPlaceChange())
         {
-            StartDisplayMonMosaicEffect();
+            RefreshDisplayMonData();
             if (sInPartyMenu || sCursorArea == CURSOR_AREA_IN_PARTY)
                 SetPokeStorageTask(Task_HandleMovingMonFromParty);
             else
@@ -3344,7 +3310,7 @@ static void Task_DepositMenu(u8 taskId)
         if (GetNumPartySpritesCompacting() == 0)
         {
             ResetSelectionAfterDeposit();
-            StartDisplayMonMosaicEffect();
+            RefreshDisplayMonData();
             // UpdatePartySlotColors();
             SetPokeStorageTask(Task_PokeStorageMain);
         }
@@ -3437,7 +3403,7 @@ static void Task_ReleaseMon(u8 taskId)
         if (GetNumPartySpritesCompacting() == 0)
         {
             RefreshDisplayMon();
-            StartDisplayMonMosaicEffect();
+            RefreshDisplayMonData();
             // UpdatePartySlotColors();
             sStorage->state++;
         }
@@ -4309,24 +4275,65 @@ static void LoadBoxTitleFrameSpritePalette(void)
     // LoadSpritePalette(&sSpritePal_BoxTitleFrame);
 }
 
-static void InitPalettesAndSprites(void)
+static bool8 InitPalettesAndSprites(void)
 {
-    LoadPalette(sSwShStorage_Pal, BG_PLTT_ID(0), sizeof(sSwShStorage_Pal));
-    LoadPalette(sTextWindows_Pal, BG_PLTT_ID(15), sizeof(sTextWindows_Pal));
-
-    // Load type icon palettes to obj pals 13-15
-    LoadPalette(sTypeIcons_Pal, OBJ_PLTT_ID(13), 3 * PLTT_SIZE_4BPP);
-
-    // Load type icon sprite sheet (only 2 slots)
-    LoadSpriteSheet(&sSpriteSheet_TypeIcons);
-
-    // Load stat labels sprite sheet
-    LoadCompressedSpriteSheet(&sStatLabelsSpriteSheet);
-
-    // NOTE: Disabled old info panel sprites
-    // CreateDisplayMonSprite();
-    // CreateMarkingComboSprite();
-    RefreshDisplayMonData();
+    switch (sStorage->graphicsLoadState)
+    {
+    case 0:
+        LoadPalette(sSwShStorage_Pal, BG_PLTT_ID(0), sizeof(sSwShStorage_Pal));
+        sStorage->graphicsLoadState++;
+        break;
+    case 1:
+        LoadPalette(sTextWindows_Pal, BG_PLTT_ID(15), sizeof(sTextWindows_Pal));
+        sStorage->graphicsLoadState++;
+        break;
+    case 2:
+        // Load type icon palettes to obj pals 13-15
+        LoadPalette(sTypeIcons_Pal, OBJ_PLTT_ID(13), 3 * PLTT_SIZE_4BPP);
+        sStorage->graphicsLoadState++;
+        break;
+    case 3:
+        // Load type icon sprite sheet (only 2 slots)
+        LoadSpriteSheet(&sSpriteSheet_TypeIcons);
+        sStorage->graphicsLoadState++;
+        break;
+    case 4:
+        // Load stat labels sprite sheet
+        LoadCompressedSpriteSheet(&sStatLabelsSpriteSheet);
+        sStorage->graphicsLoadState++;
+        break;
+    case 5:
+        // Load gender icon sprite sheet (preload to avoid frame hitch)
+        LoadCompressedSpriteSheet(&sGenderIconsSpriteSheet);
+        sStorage->graphicsLoadState++;
+        break;
+    case 6:
+        // Load shiny icon sprite sheet (preload to avoid frame hitch)
+        LoadCompressedSpriteSheet(&sShinyIconSpriteSheet);
+        sStorage->graphicsLoadState++;
+        break;
+    case 7:
+        // Load cursor sprite sheets
+        LoadCompressedSpriteSheet(sSpriteSheet_Cursor);
+        sStorage->graphicsLoadState++;
+        break;
+    case 8:
+        // Load cursor palettes
+        LoadSpritePalettes(sSpritePal_Cursor);
+        sStorage->graphicsLoadState++;
+        break;
+    case 9:
+        // Load box title frame sprite sheet
+        LoadCompressedSpriteSheet(&sSpriteSheet_BoxTitleFrame);
+        sStorage->graphicsLoadState++;
+        break;
+    case 10:
+        // Load box scroll arrow sprite sheet
+        LoadCompressedSpriteSheet(&sSpriteSheet_BoxTitleArrow);
+        sStorage->graphicsLoadState = 0;
+        return TRUE;
+    }
+    return FALSE;
 }
 
 static void CreateMarkingComboSprite(void)
@@ -4388,102 +4395,9 @@ static void UpdateMarkingComboSprite(void)
 
 static void RefreshDisplayMonData(void)
 {
-    LoadDisplayMonGfx(sStorage->displayMon.species, sStorage->displayMon.personality);
     sStorage->displayMonInfoLoadState = 0;
     while (!PrintDisplayMonInfo());
     ScheduleBgCopyTilemapToVram(0);
-}
-
-static void StartDisplayMonMosaicEffect(void)
-{
-    RefreshDisplayMonData();
-    if (sStorage->displayMonSprite)
-    {
-        sStorage->displayMonSprite->oam.mosaic = TRUE;
-        sStorage->displayMonSprite->data[0] = 10;
-        sStorage->displayMonSprite->data[1] = 1;
-        sStorage->displayMonSprite->callback = SpriteCB_DisplayMonMosaic;
-        SetGpuReg(REG_OFFSET_MOSAIC, (sStorage->displayMonSprite->data[0] << 12) | (sStorage->displayMonSprite->data[0] << 8));
-    }
-}
-
-static u8 IsDisplayMosaicActive(void)
-{
-    if (sStorage->displayMonSprite == NULL)
-        return 0;
-    return sStorage->displayMonSprite->oam.mosaic;
-}
-
-static void SpriteCB_DisplayMonMosaic(struct Sprite *sprite)
-{
-    sprite->data[0] -= sprite->data[1];
-    if (sprite->data[0] < 0)
-        sprite->data[0] = 0;
-    SetGpuReg(REG_OFFSET_MOSAIC, (sprite->data[0] << 12) | (sprite->data[0] << 8));
-    if (sprite->data[0] == 0)
-    {
-        sprite->oam.mosaic = FALSE;
-        sprite->callback = SpriteCallbackDummy;
-    }
-}
-
-static void UNUSED CreateDisplayMonSprite(void)
-{
-    u16 i;
-    u16 tileStart;
-    u8 palSlot;
-    u8 spriteId;
-    struct SpriteSheet sheet = {sStorage->tileBuffer, MON_PIC_SIZE, GFXTAG_DISPLAY_MON};
-    struct SpritePalette palette = {sStorage->displayMon.palette, PALTAG_DISPLAY_MON};
-    struct SpriteTemplate template = sSpriteTemplate_DisplayMon;
-
-    for (i = 0; i < MON_PIC_SIZE; i++)
-        sStorage->tileBuffer[i] = 0;
-
-    sStorage->displayMonSprite = NULL;
-
-    do
-    {
-        tileStart = LoadSpriteSheet(&sheet);
-        if (tileStart == 0)
-            break;
-
-        palSlot = LoadSpritePalette(&palette);
-        if (palSlot == 0xFF)
-            break;
-
-        spriteId = CreateSprite(&template, 40, 48, 0);
-        if (spriteId == MAX_SPRITES)
-            break;
-
-        sStorage->displayMonSprite = &gSprites[spriteId];
-        sStorage->displayMonPalOffset = OBJ_PLTT_ID(palSlot);
-        sStorage->displayMonTilePtr = (void *) OBJ_VRAM0 + tileStart * TILE_SIZE_4BPP;
-    } while (0);
-
-    if (sStorage->displayMonSprite == NULL)
-    {
-        FreeSpriteTilesByTag(GFXTAG_DISPLAY_MON);
-        FreeSpritePaletteByTag(PALTAG_DISPLAY_MON);
-    }
-}
-
-static void LoadDisplayMonGfx(u16 species, u32 pid)
-{
-    if (sStorage->displayMonSprite == NULL)
-        return;
-
-    if (species != SPECIES_NONE)
-    {
-        LoadSpecialPokePic(sStorage->tileBuffer, species, pid, TRUE);
-        CpuCopy32(sStorage->tileBuffer, sStorage->displayMonTilePtr, MON_PIC_SIZE);
-        LoadPalette(sStorage->displayMon.palette, sStorage->displayMonPalOffset, PLTT_SIZE_4BPP);
-        sStorage->displayMonSprite->invisible = FALSE;
-    }
-    else
-    {
-        sStorage->displayMonSprite->invisible = TRUE;
-    }
 }
 
 static void UpdateGenderIconSprite(u8 fontId)
@@ -4505,7 +4419,6 @@ static void UpdateGenderIconSprite(u8 fontId)
 
         if (sStorage->genderIconSprite == NULL)
         {
-            LoadCompressedSpriteSheet(&sGenderIconsSpriteSheet);
             sStorage->genderIconSprite = &gSprites[CreateSprite(&sSpriteTemplate_Gender, spriteX, spriteY, 0)];
         }
         else
@@ -4540,7 +4453,6 @@ static void UpdateShinyIconSprite(void)
 
         if (sStorage->shinyIconSprite == NULL)
         {
-            LoadCompressedSpriteSheet(&sShinyIconSpriteSheet);
             sStorage->shinyIconSprite = &gSprites[CreateSprite(&sSpriteTemplate_ShinyIcon, spriteX, spriteY, 0)];
         }
         else
@@ -5216,7 +5128,7 @@ static bool8 DoShowPartyMenu(void)
             {
                 UpdateMonInfoTilemap();
                 if (sStorage->setMosaic)
-                    StartDisplayMonMosaicEffect();
+                    RefreshDisplayMonData();
                 sStorage->showPartyMenuState += 2;
             }
         }
@@ -5224,7 +5136,7 @@ static bool8 DoShowPartyMenu(void)
     case 2:
         UpdateMonInfoTilemap();
         if (sStorage->setMosaic)
-            StartDisplayMonMosaicEffect();
+            RefreshDisplayMonData();
         sStorage->showPartyMenuState++;
         break;
     case 3:
@@ -6658,8 +6570,6 @@ static void CreateBoxTitleFrame(u8 boxId)
     struct SpriteTemplate template = sSpriteTemplate_BoxTitleFrame;
     template.paletteTag = PALTAG_MISC_1;
 
-    LoadCompressedSpriteSheet(&sSpriteSheet_BoxTitleFrame);
-
     for (i = 0; i < ARRAY_COUNT(sStorage->boxTitleFrameSprites); i++)
     {
         u8 animNum;
@@ -6843,7 +6753,6 @@ static void CreateBoxScrollArrows(void)
 {
     u16 i;
 
-    LoadCompressedSpriteSheet(&sSpriteSheet_BoxTitleArrow);
     for (i = 0; i < 2; i++)
     {
         u8 spriteId = CreateSprite(&sSpriteTemplate_BoxTitleArrow, 94 + i * 100, 20, 22);
@@ -7001,7 +6910,6 @@ static void InitCursor(void)
     sMovingMonOrigBoxPos = 0;
     sCursorMode = CURSOR_MODE_NORMAL;
     ClearSavedCursorPos();
-    CreateCursorSprites();
     sStorage->cursorPrevHorizPos = 1;
     sStorage->inBoxMovingMode = MOVE_MODE_NORMAL;
     TryRefreshDisplayMon();
@@ -7011,7 +6919,6 @@ static void InitCursorOnReopen(void)
 {
     if (sStorage->partySprites[0] == NULL)
         CreatePartyMonsSprites(TRUE);
-    CreateCursorSprites();
     ReshowDisplayMon();
     sStorage->cursorPrevHorizPos = 1;
     sStorage->inBoxMovingMode = MOVE_MODE_NORMAL;
@@ -9097,8 +9004,6 @@ static void CreateCursorSprites(void)
     u16 x, y;
     u8 spriteId;
 
-    LoadCompressedSpriteSheet(sSpriteSheet_Cursor);
-    LoadSpritePalettes(sSpritePal_Cursor);
     sStorage->cursorPalNums[CURSOR_MODE_NORMAL]      = IndexOfSpritePaletteTag(PALTAG_MISC_1); // Red cursor
     sStorage->cursorPalNums[CURSOR_MODE_AUTO_ACTION] = IndexOfSpritePaletteTag(PALTAG_MISC_2); // Blue cursor
     sStorage->cursorPalNums[CURSOR_MODE_MULTI_MOVE]  = IndexOfSpritePaletteTag(PALTAG_MISC_3); // Green cursor
@@ -11304,8 +11209,7 @@ void UpdateSpeciesSpritePSS(struct BoxPokemon *boxMon)
     {
         if (sRefreshDisplayMonGfx)
         {
-            LoadDisplayMonGfx(species, pid);
-            StartDisplayMonMosaicEffect();
+            RefreshDisplayMonData();
             sRefreshDisplayMonGfx = FALSE;
         }
 
