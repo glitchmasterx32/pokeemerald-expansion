@@ -777,7 +777,6 @@ static bool8 IsCursorOnBoxTitle(void);
 static void CreateBoxScrollArrows(void);
 static void AnimateBoxScrollArrow(s8);
 static void UpdateBoxTitle(u8);
-static void AnimateBoxScrollArrows(bool8);
 static void SpriteCB_Arrow(struct Sprite *);
 static struct Sprite *CreateChooseBoxArrows(u16, u16, u8, u8, u8);
 
@@ -2986,7 +2985,6 @@ static void Task_HandleBoxOptions(u8 taskId)
         {
         case MENU_B_PRESSED:
         case MENU_CANCEL:
-            AnimateBoxScrollArrows(TRUE);
             ClearBottomWindow();
             SetPokeStorageTask(Task_PokeStorageMain);
             break;
@@ -5593,30 +5591,6 @@ static void CreateBoxScrollArrows(void)
     }
 }
 
-// Bounce scroll arrows while title is selected
-static void AnimateBoxScrollArrows(bool8 animate)
-{
-    u16 i;
-
-    if (animate)
-    {
-        // Start arrows moving
-        for (i = 0; i < 2; i++)
-        {
-            sStorage->arrowSprites[i]->sState = 1;
-            sStorage->arrowSprites[i]->sTimer = 0;
-            sStorage->arrowSprites[i]->data[2] = 0;
-            sStorage->arrowSprites[i]->data[4] = 0;
-        }
-    }
-    else
-    {
-        // Stop arrows moving
-        for (i = 0; i < 2; i++)
-            sStorage->arrowSprites[i]->sState = 0;
-    }
-}
-
 // Trigger one-shot animation for the arrow in the given direction
 static void AnimateBoxScrollArrow(s8 direction)
 {
@@ -7490,7 +7464,6 @@ static u8 HandleInput_OnBox(void)
 
         if (JOY_NEW(A_BUTTON))
         {
-            AnimateBoxScrollArrows(FALSE);
             AddBoxOptionsMenu();
             return INPUT_BOX_OPTIONS;
         }
@@ -7520,8 +7493,6 @@ static u8 HandleInput_OnBox(void)
 
     if (retVal != INPUT_NONE)
     {
-        if (cursorArea != CURSOR_AREA_BOX_TITLE)
-            AnimateBoxScrollArrows(FALSE);
         SetCursorPosition(cursorArea, cursorPosition);
     }
 
