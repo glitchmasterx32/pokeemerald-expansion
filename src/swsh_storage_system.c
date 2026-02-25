@@ -1614,8 +1614,10 @@ static void SetMonIconTransparency(void)
 {
     if (sStorage->boxOption == OPTION_MOVE_ITEMS)
     {
-        SetGpuReg(REG_OFFSET_BLDCNT, BLDCNT_TGT2_ALL);
-        SetGpuReg(REG_OFFSET_BLDALPHA, BLDALPHA_BLEND(7, 11));
+        // SetGpuReg(REG_OFFSET_BLDCNT, BLDCNT_TGT2_ALL);
+        // SetGpuReg(REG_OFFSET_BLDALPHA, BLDALPHA_BLEND(7, 11));
+        SetGpuReg(REG_OFFSET_BLDCNT, BLDCNT_TGT1_OBJ | BLDCNT_TGT1_BG2 | BLDCNT_EFFECT_BLEND | BLDCNT_TGT2_BG3);
+        SetGpuReg(REG_OFFSET_BLDALPHA, BLDALPHA_BLEND(12, 4));
     }
     SetGpuReg(REG_OFFSET_DISPCNT, DISPCNT_OBJ_ON | DISPCNT_BG_ALL_ON | DISPCNT_OBJ_1D_MAP);
 }
@@ -4795,10 +4797,6 @@ static void MovePartySpriteToNextSlot(struct Sprite *sprite, u16 partyId)
     sprite->sPartyId = partyId;
     x = 40; 
     y = 24 * partyId + 16;
-    // if (partyId == 0)
-    //     x = 104, y = 64;
-    // else
-    //     x = 152, y = 8 * (3 * (partyId - 1)) + 16;
 
     sprite->sMonX = (u16)(sprite->x) * 8;
     sprite->sMonY = (u16)(sprite->y) * 8;
@@ -4820,19 +4818,8 @@ static void SpriteCB_MovePartyMonToNextSlot(struct Sprite *sprite)
     }
     else
     {
-        // New coordinates: x=40, y=16 + 24 * sPartyId
         sprite->x = 40;
         sprite->y = 24 * sprite->sPartyId + 16;
-        // if (sprite->sPartyId == 0)
-        // {
-        //     sprite->x = 104;
-        //     sprite->y = 64;
-        // }
-        // else
-        // {
-        //     sprite->x = 152;
-        //     sprite->y = 8 * (3 * (sprite->sPartyId - 1)) + 16;
-        // }
         sprite->callback = SpriteCallbackDummy;
         sStorage->partySprites[sprite->sPartyId] = sprite;
         sStorage->numPartyToCompact--;
@@ -5707,22 +5694,7 @@ static void GetCursorCoordsByPos(u8 cursorArea, u8 cursorPosition, u16 *x, u16 *
         break;
     case CURSOR_AREA_IN_PARTY:
         *x = 40;
-        *y = cursorPosition * 24 + 8; // 12px offset like box
-        // if (cursorPosition == 0)
-        // {
-        //     *x = 104;
-        //     *y = 52;
-        // }
-        // else if (cursorPosition == PARTY_SIZE)
-        // {
-        //     *x = 152;
-        //     *y = 132;
-        // }
-        // else
-        // {
-        //     *x = 152;
-        //     *y = (cursorPosition - 1) * 24 + 4;
-        // }
+        *y = cursorPosition * 24 + 8;
         break;
     case CURSOR_AREA_BOX_TITLE:
         *x = 144;
@@ -8824,21 +8796,13 @@ static void SetItemIconPosition(u8 id, u8 cursorArea, u8 cursorPos)
     case CURSOR_AREA_IN_BOX:
         x = cursorPos % IN_BOX_COLUMNS;
         y = cursorPos / IN_BOX_COLUMNS;
-        sStorage->itemIcons[id].sprite->x = (24 * x) + 112;
-        sStorage->itemIcons[id].sprite->y = (24 * y) + 56;
+        sStorage->itemIcons[id].sprite->x = (24 * x) + 104;
+        sStorage->itemIcons[id].sprite->y = (24 * y) + 52;
         sStorage->itemIcons[id].sprite->oam.priority = 1;
         break;
     case CURSOR_AREA_IN_PARTY:
-        if (cursorPos == 0)
-        {
-            sStorage->itemIcons[id].sprite->x = 116;
-            sStorage->itemIcons[id].sprite->y = 76;
-        }
-        else
-        {
-            sStorage->itemIcons[id].sprite->x = 164;
-            sStorage->itemIcons[id].sprite->y = 24 * (cursorPos - 1) + 28;
-        }
+        sStorage->itemIcons[id].sprite->x = 52;
+        sStorage->itemIcons[id].sprite->y = 24 * cursorPos + 28;
         sStorage->itemIcons[id].sprite->oam.priority = 1;
         break;
     }
@@ -9018,7 +8982,7 @@ static void SpriteCB_ItemIcon_ToHand(struct Sprite *sprite)
         sprite->data[1] = sprite->x << 4;
         sprite->data[2] = sprite->y << 4;
         sprite->data[3] = 10;
-        sprite->data[4] = 21;
+        sprite->data[4] = 16;
         sprite->data[5] = 0;
         sprite->sState++;
     case 1:
@@ -9047,7 +9011,7 @@ static void SpriteCB_ItemIcon_ToMon(struct Sprite *sprite)
         sprite->data[1] = sprite->x << 4;
         sprite->data[2] = sprite->y << 4;
         sprite->data[3] = 10;
-        sprite->data[4] = 21;
+        sprite->data[4] = 16;
         sprite->data[5] = 0;
         sprite->sState++;
     case 1:
@@ -9069,23 +9033,35 @@ static void SpriteCB_ItemIcon_SwapToHand(struct Sprite *sprite)
     switch (sprite->sState)
     {
     case 0:
-        sprite->data[1] = sprite->x << 4;
-        sprite->data[2] = sprite->y << 4;
-        sprite->data[3] = 10;
-        sprite->data[4] = 21;
+        sprite->data[1] = sprite->x;
+        sprite->data[2] = sprite->y;
+        sprite->data[3] = sStorage->cursorSprite->x + 4;
+        sprite->data[4] = sStorage->cursorSprite->y + sStorage->cursorSprite->y2 + 8;
         sprite->data[5] = 0;
         sprite->sState++;
     case 1:
-        sprite->data[1] -= sprite->data[3];
-        sprite->data[2] -= sprite->data[4];
-        sprite->x = sprite->data[1] >> 4;
-        sprite->y = sprite->data[2] >> 4;
-        sprite->x2 = gSineTable[sprite->data[5] * 8] >> 4;
-        if (++sprite->data[5] > 11)
+        if (++sprite->data[5] > 16)
         {
             SetItemIconPosition(GetItemIconIdxBySprite(sprite), sprite->sCursorArea, sprite->sCursorPos);
             sprite->x2 = 0;
+            sprite->y2 = 0;
             sprite->callback = SpriteCB_ItemIcon_SetPosToCursor;
+        }
+        else
+        {
+            s32 t = sprite->data[5];
+            s32 startX = sprite->data[1];
+            s32 startY = sprite->data[2];
+            s32 endX = sprite->data[3];
+            s32 endY = sprite->data[4];
+            
+            sprite->x = startX + (endX - startX) * t / 16;
+            sprite->y = startY + (endY - startY) * t / 16;
+            
+            s32 dx = endX - startX;
+            s32 dy = endY - startY;
+            sprite->x2 = -dy * t * (16 - t) / 64;
+            sprite->y2 = dx * t * (16 - t) / 64;
         }
         break;
     }
@@ -9096,23 +9072,45 @@ static void SpriteCB_ItemIcon_SwapToMon(struct Sprite *sprite)
     switch (sprite->sState)
     {
     case 0:
-        sprite->data[1] = sprite->x << 4;
-        sprite->data[2] = sprite->y << 4;
-        sprite->data[3] = 10;
-        sprite->data[4] = 21;
+        sprite->data[1] = sprite->x;
+        sprite->data[2] = sprite->y;
+        if (sprite->sCursorArea == CURSOR_AREA_IN_BOX)
+        {
+            u8 x = sprite->sCursorPos % IN_BOX_COLUMNS;
+            u8 y = sprite->sCursorPos / IN_BOX_COLUMNS;
+            sprite->data[3] = (24 * x) + 104;
+            sprite->data[4] = (24 * y) + 52;
+        }
+        else // CURSOR_AREA_IN_PARTY
+        {
+            sprite->data[3] = 52;
+            sprite->data[4] = 24 * sprite->sCursorPos + 28;
+        }
         sprite->data[5] = 0;
         sprite->sState++;
     case 1:
-        sprite->data[1] += sprite->data[3];
-        sprite->data[2] += sprite->data[4];
-        sprite->x = sprite->data[1] >> 4;
-        sprite->y = sprite->data[2] >> 4;
-        sprite->x2 = -(gSineTable[sprite->data[5] * 8] >> 4);
-        if (++sprite->data[5] > 11)
+        if (++sprite->data[5] > 16)
         {
             SetItemIconPosition(GetItemIconIdxBySprite(sprite), sprite->sCursorArea, sprite->sCursorPos);
             sprite->callback = SpriteCallbackDummy;
             sprite->x2 = 0;
+            sprite->y2 = 0;
+        }
+        else
+        {
+            s32 t = sprite->data[5];
+            s32 startX = sprite->data[1];
+            s32 startY = sprite->data[2];
+            s32 endX = sprite->data[3];
+            s32 endY = sprite->data[4];
+            
+            sprite->x = startX + (endX - startX) * t / 16;
+            sprite->y = startY + (endY - startY) * t / 16;
+            
+            s32 dx = endX - startX;
+            s32 dy = endY - startY;
+            sprite->x2 = -dy * t * (16 - t) / 64;
+            sprite->y2 = dx * t * (16 - t) / 64;
         }
         break;
     }

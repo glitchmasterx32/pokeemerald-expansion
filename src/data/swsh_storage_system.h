@@ -1107,28 +1107,28 @@ static const struct OamData sOamData_ItemIcon =
 
 static const union AffineAnimCmd sAffineAnim_ItemIcon_Small[] =
 {
-    AFFINEANIMCMD_FRAME(128, 128, 0, 0),
+    AFFINEANIMCMD_FRAME(192, 192, 0, 0),
     AFFINEANIMCMD_END
 };
 
 static const union AffineAnimCmd sAffineAnim_ItemIcon_Appear[] =
 {
-    AFFINEANIMCMD_FRAME(88, 88, 0, 0),
+    AFFINEANIMCMD_FRAME(152, 152, 0, 0),
     AFFINEANIMCMD_FRAME(5, 5, 0, 8),
     AFFINEANIMCMD_END
 };
 
 static const union AffineAnimCmd sAffineAnim_ItemIcon_Disappear[] =
 {
-    AFFINEANIMCMD_FRAME(128, 128, 0, 0),
+    AFFINEANIMCMD_FRAME(192, 192, 0, 0),
     AFFINEANIMCMD_FRAME(-5, -5, 0, 8),
     AFFINEANIMCMD_END
 };
 
 static const union AffineAnimCmd sAffineAnim_ItemIcon_PickUp[] =
 {
-    AFFINEANIMCMD_FRAME(128, 128, 0, 0),
-    AFFINEANIMCMD_FRAME(10, 10, 0, 12),
+    AFFINEANIMCMD_FRAME(192, 192, 0, 0),
+    AFFINEANIMCMD_FRAME(6, 6, 0, 12),
     AFFINEANIMCMD_FRAME(256, 256, 0, 0),
     AFFINEANIMCMD_END
 };
@@ -1136,8 +1136,8 @@ static const union AffineAnimCmd sAffineAnim_ItemIcon_PickUp[] =
 static const union AffineAnimCmd sAffineAnim_ItemIcon_PutDown[] =
 {
     AFFINEANIMCMD_FRAME(256, 256, 0, 0),
-    AFFINEANIMCMD_FRAME(-10, -10, 0, 12),
-    AFFINEANIMCMD_FRAME(128, 128, 0, 0),
+    AFFINEANIMCMD_FRAME(-6, -6, 0, 12),
+    AFFINEANIMCMD_FRAME(192, 192, 0, 0),
     AFFINEANIMCMD_END
 };
 
