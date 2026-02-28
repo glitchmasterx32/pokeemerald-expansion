@@ -371,8 +371,7 @@ struct StorageMenu
 
 struct ChooseBoxMenu
 {
-    struct Sprite *menuSprite;
-    struct Sprite *menuSideSprites[4];
+    struct Sprite *menuSprites[2];
     struct Sprite *textSprite;
     struct Sprite *textSprite2;
     struct Sprite *arrowSprites[2];
@@ -1373,20 +1372,20 @@ static void ChooseBoxMenu_CreateSprites(u8 curBox)
     template.tileTag = sChooseBoxMenu->tileTag;
     template.paletteTag = sChooseBoxMenu->paletteTag;
 
-    spriteId = CreateSprite(&template, 128, 88, 1);
-    sChooseBoxMenu->menuSprite = &gSprites[spriteId];
-    StartSpriteAnim(sChooseBoxMenu->menuSprite, 0);
+    spriteId = CreateSprite(&template, 132, 80, 1);
+    sChooseBoxMenu->menuSprites[0] = &gSprites[spriteId];
+    StartSpriteAnim(sChooseBoxMenu->menuSprites[0], 0);
 
-    spriteId = CreateSprite(&template, 160, 88, 1);
-    sChooseBoxMenu->menuSideSprites[0] = &gSprites[spriteId];
-    StartSpriteAnim(sChooseBoxMenu->menuSideSprites[0], 1);
+    spriteId = CreateSprite(&template, 164, 80, 1);
+    sChooseBoxMenu->menuSprites[1] = &gSprites[spriteId];
+    StartSpriteAnim(sChooseBoxMenu->menuSprites[1], 1);
 
     sChooseBoxMenu->textSprite = NULL;
     sChooseBoxMenu->textSprite2 = NULL;
 
     for (i = 0; i < ARRAY_COUNT(sChooseBoxMenu->arrowSprites); i++)
     {
-        sChooseBoxMenu->arrowSprites[i] = CreateChooseBoxArrows(42 * i + 123, 73, i, 0, 0);
+        sChooseBoxMenu->arrowSprites[i] = CreateChooseBoxArrows(42 * i + 127, 65, i, 0, 0);
         if (sChooseBoxMenu->arrowSprites[i])
         {
             sChooseBoxMenu->arrowSprites[i]->data[0] = 0;
@@ -1400,15 +1399,13 @@ static void ChooseBoxMenu_CreateSprites(u8 curBox)
 static void ChooseBoxMenu_DestroySprites(void)
 {
     u16 i;
-    if (sChooseBoxMenu->menuSprite)
+    for (i = 0; i < ARRAY_COUNT(sChooseBoxMenu->menuSprites); i++)
     {
-        DestroySprite(sChooseBoxMenu->menuSprite);
-        sChooseBoxMenu->menuSprite = NULL;
-    }
-    if (sChooseBoxMenu->menuSideSprites[0])
-    {
-        DestroySprite(sChooseBoxMenu->menuSideSprites[0]);
-        sChooseBoxMenu->menuSideSprites[0] = NULL;
+        if (sChooseBoxMenu->menuSprites[i])
+        {
+            DestroySprite(sChooseBoxMenu->menuSprites[i]);
+            sChooseBoxMenu->menuSprites[i] = NULL;
+        }
     }
     if (sChooseBoxMenu->textSprite)
     {
@@ -1480,7 +1477,7 @@ static void ChooseBoxMenu_PrintInfo(void)
     FreeSpriteTilesByTag(GFXTAG_BOX_SELECTION_BOX_NAME);
     struct SpriteSheet spriteSheet = {sChooseBoxMenu->textTiles, 0x400, GFXTAG_BOX_SELECTION_BOX_NAME};
     LoadSpriteSheet(&spriteSheet);
-    spriteId = CreateSprite(&sSpriteTemplate_BoxSelectionText, 144, 104, 0);
+    spriteId = CreateSprite(&sSpriteTemplate_BoxSelectionText, 148, 96, 0);
     sChooseBoxMenu->textSprite = &gSprites[spriteId];
 
     memset(&template, 0, sizeof(template));
@@ -1501,7 +1498,7 @@ static void ChooseBoxMenu_PrintInfo(void)
     FreeSpriteTilesByTag(GFXTAG_BOX_SELECTION_PER_30);
     spriteSheet = (struct SpriteSheet){sChooseBoxMenu->textTiles2, 0x400, GFXTAG_BOX_SELECTION_PER_30};
     LoadSpriteSheet(&spriteSheet);
-    spriteId = CreateSprite(&sSpriteTemplate_BoxSelectionText2, 144, 80, 0);
+    spriteId = CreateSprite(&sSpriteTemplate_BoxSelectionText2, 148, 72, 0);
     sChooseBoxMenu->textSprite2 = &gSprites[spriteId];
 }
 
@@ -5504,8 +5501,7 @@ static bool32 WaitForWallpaperGfxLoad(void)
 static void CreateBoxTitleFrame(u8 boxId)
 {
     u8 i;
-    // Position x=96 and y=20
-    s16 x = 96;
+    s16 x = 100;
     s16 y = 20;
 
     struct SpriteTemplate template = sSpriteTemplate_BoxTitleFrame;
@@ -5610,7 +5606,7 @@ static void UpdateBoxTitlePalette(void)
 
 static s16 GetBoxTitleBaseX(const u8 *string)
 {
-    return DISPLAY_WIDTH - 80 - GetStringWidth(FONT_SHORT, string, 0) / 2;
+    return DISPLAY_WIDTH - 76 - GetStringWidth(FONT_SHORT, string, 0) / 2;
 }
 
 
@@ -5630,7 +5626,7 @@ static void CreateBoxScrollArrows(void)
 
     for (i = 0; i < 2; i++)
     {
-        u8 spriteId = CreateSprite(&sSpriteTemplate_BoxTitleArrow, 94 + i * 100, 20, 22);
+        u8 spriteId = CreateSprite(&sSpriteTemplate_BoxTitleArrow, 98 + i * 100, 20, 22);
         if (spriteId != MAX_SPRITES)
         {
             struct Sprite *sprite = &gSprites[spriteId];
@@ -5758,7 +5754,7 @@ static void GetCursorCoordsByPos(u8 cursorArea, u8 cursorPosition, u16 *x, u16 *
         *y = cursorPosition * 24 + 8;
         break;
     case CURSOR_AREA_BOX_TITLE:
-        *x = 144;
+        *x = 147;
         *y = 8;
         break;
     case 4:
