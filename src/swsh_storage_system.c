@@ -3077,6 +3077,7 @@ static void Task_HandleBoxOptions(u8 taskId)
 static void Task_HandleWallpapers(u8 taskId)
 {
     s32 input;
+    u8 maxPage = (MENU_COUNT - MENU_BASE - 1) / 5;
 
     switch (sStorage->state)
     {
@@ -3087,28 +3088,51 @@ static void Task_HandleWallpapers(u8 taskId)
         sStorage->state++;
         break;
     case 1:
-        input = ListMenu_ProcessInput(sStorage->listMenuTaskId);
-        ListMenuGetScrollAndRow(sStorage->listMenuTaskId, &sStorage->listMenuScrollRow, &sStorage->listMenuSelectedRow);
-        if (input != LIST_NOTHING_CHOSEN)
+        if (JOY_NEW(DPAD_LEFT) && sStorage->listMenuScrollRow > 0)
         {
-            if (input == LIST_CANCEL)
+            PlaySE(SE_SELECT);
+            sStorage->listMenuScrollRow--;
+            sStorage->listMenuSelectedRow = 0;
+            DestroyListMenuTask(sStorage->listMenuTaskId, NULL, NULL);
+            RemoveScrollIndicatorArrowPair(sStorage->listMenuScrollArrowTaskId);
+            RemoveMenu();
+            AddWallpaperMenu();
+        }
+        else if (JOY_NEW(DPAD_RIGHT) && sStorage->listMenuScrollRow < maxPage)
+        {
+            PlaySE(SE_SELECT);
+            sStorage->listMenuScrollRow++;
+            sStorage->listMenuSelectedRow = 0;
+            DestroyListMenuTask(sStorage->listMenuTaskId, NULL, NULL);
+            RemoveScrollIndicatorArrowPair(sStorage->listMenuScrollArrowTaskId);
+            RemoveMenu();
+            AddWallpaperMenu();
+        }
+        else
+        {
+            input = ListMenu_ProcessInput(sStorage->listMenuTaskId);
+            ListMenuGetScrollAndRow(sStorage->listMenuTaskId, NULL, &sStorage->listMenuSelectedRow);
+            if (input != LIST_NOTHING_CHOSEN)
             {
-                DestroyListMenuTask(sStorage->listMenuTaskId, &sStorage->listMenuScrollRow, &sStorage->listMenuSelectedRow);
-                RemoveScrollIndicatorArrowPair(sStorage->listMenuScrollArrowTaskId);
-                RemoveMenu();
-                ClearBottomWindow();
-                SetPokeStorageTask(Task_PokeStorageMain);
-            }
-            else
-            {
-                PlaySE(SE_SELECT);
-                DestroyListMenuTask(sStorage->listMenuTaskId, &sStorage->listMenuScrollRow, &sStorage->listMenuSelectedRow);
-                RemoveScrollIndicatorArrowPair(sStorage->listMenuScrollArrowTaskId);
-                RemoveMenu();
-                sStorage->wallpaperId = input - MENU_BASE;
-                SetWallpaperForCurrentBox(sStorage->wallpaperId);
-                ClearBottomWindow();
-                SetPokeStorageTask(Task_WallpaperChange);
+                if (input == LIST_CANCEL)
+                {
+                    DestroyListMenuTask(sStorage->listMenuTaskId, NULL, NULL);
+                    RemoveScrollIndicatorArrowPair(sStorage->listMenuScrollArrowTaskId);
+                    RemoveMenu();
+                    ClearBottomWindow();
+                    SetPokeStorageTask(Task_PokeStorageMain);
+                }
+                else
+                {
+                    PlaySE(SE_SELECT);
+                    DestroyListMenuTask(sStorage->listMenuTaskId, NULL, NULL);
+                    RemoveScrollIndicatorArrowPair(sStorage->listMenuScrollArrowTaskId);
+                    RemoveMenu();
+                    sStorage->wallpaperId = input - MENU_BASE;
+                    SetWallpaperForCurrentBox(sStorage->wallpaperId);
+                    ClearBottomWindow();
+                    SetPokeStorageTask(Task_WallpaperChange);
+                }
             }
         }
         break;
@@ -4338,16 +4362,33 @@ static void ClearBottomWindow(void)
 static void AddWallpaperMenu(void)
 {
     u16 i;
+    u8 currentPage = sStorage->listMenuScrollRow;
+    u8 itemsPerPage = 5;
+    u8 maxPage = (MENU_COUNT - MENU_BASE - 1) / itemsPerPage;
+    u8 startIdx = MENU_BASE + (currentPage * itemsPerPage);
+    u8 endIdx = startIdx + itemsPerPage;
+    u8 maxWidth = 0;
+    u8 len;
+
+    if (endIdx > MENU_COUNT)
+        endIdx = MENU_COUNT;
+
+    for (i = MENU_BASE; i < MENU_COUNT; i++)
+    {
+        len = GetStringWidth(FONT_NORMAL, sMenuTexts[i], 0);
+        if (len > maxWidth)
+            maxWidth = len;
+    }
 
     InitMenu();
-    for (i = MENU_BASE; i < MENU_COUNT; i++)
+    for (i = startIdx; i < endIdx; i++)
     {
         SetMenuText(i);
     }
     sStorage->menuItems[sStorage->menuItemsCount].text = NULL;
     sStorage->menuItems[sStorage->menuItemsCount].textId = 0;
 
-    sStorage->menuWindow.width = (8 + sStorage->menuWidth + 8 + 7) / 8;
+    sStorage->menuWindow.width = (8 + maxWidth + 8 + 7) / 8;
     if (sStorage->menuWindow.width > 28)
         sStorage->menuWindow.width = 28;
 
@@ -4362,7 +4403,7 @@ static void AddWallpaperMenu(void)
     sStorage->listMenuTemplate.moveCursorFunc = ListMenuDefaultCursorMoveFunc;
     sStorage->listMenuTemplate.itemPrintFunc = NULL;
     sStorage->listMenuTemplate.totalItems = sStorage->menuItemsCount;
-    sStorage->listMenuTemplate.maxShowed = 5;
+    sStorage->listMenuTemplate.maxShowed = sStorage->menuItemsCount;
     sStorage->listMenuTemplate.windowId = sStorage->menuWindowId;
     sStorage->listMenuTemplate.header_X = 0;
     sStorage->listMenuTemplate.item_X = 8;
@@ -4373,20 +4414,14 @@ static void AddWallpaperMenu(void)
     sStorage->listMenuTemplate.cursorShadowPal = 3;
     sStorage->listMenuTemplate.lettersSpacing = 1;
     sStorage->listMenuTemplate.itemVerticalPadding = 0;
-    sStorage->listMenuTemplate.scrollMultiple = LIST_MULTIPLE_SCROLL_DPAD;
+    sStorage->listMenuTemplate.scrollMultiple = LIST_NO_MULTIPLE_SCROLL;
     sStorage->listMenuTemplate.fontId = FONT_NORMAL;
     sStorage->listMenuTemplate.cursorKind = 0;
 
-    sStorage->listMenuTaskId = ListMenuInit(&sStorage->listMenuTemplate, sStorage->listMenuScrollRow, sStorage->listMenuSelectedRow);
+    sStorage->listMenuTaskId = ListMenuInit(&sStorage->listMenuTemplate, 0, sStorage->listMenuSelectedRow);
     sStorage->listMenuScrollArrowTaskId = AddScrollIndicatorArrowPairParameterized(
-        SCROLL_ARROW_UP,
-        (sStorage->menuWindow.tilemapLeft + sStorage->menuWindow.width / 2) * 8,    // Center X
-        sStorage->menuWindow.tilemapTop * 8 - 4,                                    // Top Y
-        (sStorage->menuWindow.tilemapTop + sStorage->menuWindow.height) * 8 + 4,    // Bottom Y
-        sStorage->menuItemsCount - sStorage->listMenuTemplate.maxShowed, 
-        GFXTAG_LIST_MENU_ARROW, 
-        PALTAG_LIST_MENU_SCROLL_ARROW, 
-        &sStorage->listMenuScrollRow);
+        SCROLL_ARROW_LEFT, 80, 168, 232, maxPage,
+        GFXTAG_LIST_MENU_ARROW, PALTAG_LIST_MENU_SCROLL_ARROW, &sStorage->listMenuScrollRow);
 
     ScheduleBgCopyTilemapToVram(0);
 }
@@ -4454,10 +4489,10 @@ static void CreateMovingMonIcon(void)
 static bool32 ShouldBoxmonSpriteBeTransparent(u32 boxId, u32 boxPosition)
 {
     if (sStorage->boxOption == OPTION_MOVE_ITEMS
-     && GetBoxMonDataAt(boxId, boxPosition, MON_DATA_HELD_ITEM) == ITEM_NONE)
+        && GetBoxMonDataAt(boxId, boxPosition, MON_DATA_HELD_ITEM) == ITEM_NONE)
         return TRUE;
     if (sStorage->boxOption == OPTION_SELECT_MON
-     && IsBoxMonExcluded(GetBoxedMonPtr(boxId, boxPosition)))
+        && IsBoxMonExcluded(GetBoxedMonPtr(boxId, boxPosition)))
         return TRUE;
     return FALSE;
 }
@@ -4676,7 +4711,7 @@ static bool8 UpdateBoxMonIconScroll(void)
         sStorage->iconScrollNumIncoming += CreateBoxMonIconsInColumn(sStorage->iconScrollCurColumn, sStorage->iconScrollDistance, sStorage->iconScrollSpeed);
 
         if ((sStorage->iconScrollDirection > 0 && sStorage->iconScrollCurColumn == IN_BOX_COLUMNS - 1)
-         || (sStorage->iconScrollDirection < 0 && sStorage->iconScrollCurColumn == 0))
+            || (sStorage->iconScrollDirection < 0 && sStorage->iconScrollCurColumn == 0))
         {
             // Scroll has reached final column
             sStorage->iconScrollState++;
@@ -4989,7 +5024,7 @@ static void SetReleaseMon(u8 mode, u8 position)
 static bool8 TryHideReleaseMonSprite(void)
 {
     if (*sStorage->releaseMonSpritePtr == NULL
-    || (*sStorage->releaseMonSpritePtr)->invisible)
+        || (*sStorage->releaseMonSpritePtr)->invisible)
         return FALSE;
 
     if ((*sStorage->releaseMonSpritePtr)->affineAnimEnded)
@@ -6360,8 +6395,8 @@ static void GetRestrictedReleaseMoves(u16 *moves)
     for (i = 0; i < ARRAY_COUNT(sRestrictedReleaseMoves); i++)
     {
         if (sRestrictedReleaseMoves[i].mapGroup == MAP_GROUPS_COUNT
-        || (sRestrictedReleaseMoves[i].mapGroup == gSaveBlock1Ptr->location.mapGroup
-         && sRestrictedReleaseMoves[i].mapNum == gSaveBlock1Ptr->location.mapNum))
+            || (sRestrictedReleaseMoves[i].mapGroup == gSaveBlock1Ptr->location.mapGroup
+                && sRestrictedReleaseMoves[i].mapNum == gSaveBlock1Ptr->location.mapNum))
         {
             *moves = sRestrictedReleaseMoves[i].move;
             moves++;
@@ -6496,7 +6531,7 @@ static s8 RunCanReleaseMon(void)
         {
             knownMoves = GetAndCopyBoxMonDataAt(sStorage->releaseCheckBoxId, sStorage->releaseCheckBoxPos, MON_DATA_KNOWN_MOVES, (u8 *)sStorage->restrictedMoveList);
             if (knownMoves != 0 && !(sStorage->releaseBoxId == sStorage->releaseCheckBoxId
-                                  && sStorage->releaseBoxPos == sStorage->releaseCheckBoxPos))
+                                    && sStorage->releaseBoxPos == sStorage->releaseCheckBoxPos))
             {
                 // Found PC Pokémon with restricted move, clear move from list
                 sStorage->restrictedReleaseMonMoves &= ~(knownMoves);
@@ -6624,7 +6659,9 @@ static void SetMonMarkings(u8 markings)
 
 static bool8 IsRemovingLastPartyMon(void)
 {
-    if (sCursorArea == CURSOR_AREA_IN_PARTY && !sIsMonBeingMoved && CountPartyAliveNonEggMonsExcept(sCursorPosition) == 0)
+    if (sCursorArea == CURSOR_AREA_IN_PARTY
+        && !sIsMonBeingMoved
+        && CountPartyAliveNonEggMonsExcept(sCursorPosition) == 0)
         return TRUE;
     else
         return FALSE;
@@ -6634,9 +6671,11 @@ static bool8 CanPlaceMon(void)
 {
     if (sIsMonBeingMoved)
     {
-        if (sCursorArea == CURSOR_AREA_IN_PARTY && GetMonData(&gPlayerParty[sCursorPosition], MON_DATA_SPECIES) == SPECIES_NONE)
+        if (sCursorArea == CURSOR_AREA_IN_PARTY
+            && GetMonData(&gPlayerParty[sCursorPosition], MON_DATA_SPECIES) == SPECIES_NONE)
             return TRUE;
-        else if (sCursorArea == CURSOR_AREA_IN_BOX && GetBoxMonDataAt(StorageGetCurrentBox(), sCursorPosition, MON_DATA_SPECIES_OR_EGG) == SPECIES_NONE)
+        else if (sCursorArea == CURSOR_AREA_IN_BOX
+                && GetBoxMonDataAt(StorageGetCurrentBox(), sCursorPosition, MON_DATA_SPECIES_OR_EGG) == SPECIES_NONE)
             return TRUE;
         else
             return FALSE;
@@ -8687,10 +8726,10 @@ static bool8 IsItemIconAnimActive(void)
         if (sStorage->itemIcons[i].active)
         {
             if (!sStorage->itemIcons[i].sprite->affineAnimEnded
-              && sStorage->itemIcons[i].sprite->affineAnimBeginning)
+                && sStorage->itemIcons[i].sprite->affineAnimBeginning)
                 return TRUE;
             if (sStorage->itemIcons[i].sprite->callback != SpriteCallbackDummy
-             && sStorage->itemIcons[i].sprite->callback != SpriteCB_ItemIcon_SetPosToCursor)
+                && sStorage->itemIcons[i].sprite->callback != SpriteCB_ItemIcon_SetPosToCursor)
                 return TRUE;
         }
     }
@@ -8706,7 +8745,7 @@ static bool8 IsMovingItem(void)
         for (i = 0; i < MAX_ITEM_ICONS; i++)
         {
             if (sStorage->itemIcons[i].active
-             && sStorage->itemIcons[i].area == CURSOR_AREA_IN_HAND)
+                && sStorage->itemIcons[i].area == CURSOR_AREA_IN_HAND)
                 return TRUE;
         }
     }
@@ -8745,8 +8784,8 @@ static bool32 IsItemIconAtPosition(u8 cursorArea, u8 cursorPos)
     for (i = 0; i < MAX_ITEM_ICONS; i++)
     {
         if (sStorage->itemIcons[i].active
-         && sStorage->itemIcons[i].area == cursorArea
-         && sStorage->itemIcons[i].pos == cursorPos)
+            && sStorage->itemIcons[i].area == cursorArea
+            && sStorage->itemIcons[i].pos == cursorPos)
             return TRUE;
     }
     return FALSE;
@@ -8759,8 +8798,8 @@ static u8 GetItemIconIdxByPosition(u8 cursorArea, u8 cursorPos)
     for (i = 0; i < MAX_ITEM_ICONS; i++)
     {
         if (sStorage->itemIcons[i].active
-         && sStorage->itemIcons[i].area == cursorArea
-         && sStorage->itemIcons[i].pos == cursorPos)
+            && sStorage->itemIcons[i].area == cursorArea
+            && sStorage->itemIcons[i].pos == cursorPos)
             return i;
     }
     return MAX_ITEM_ICONS;
@@ -8773,7 +8812,7 @@ static u8 GetItemIconIdxBySprite(struct Sprite *sprite)
     for (i = 0; i < MAX_ITEM_ICONS; i++)
     {
         if (sStorage->itemIcons[i].active
-         && sStorage->itemIcons[i].sprite == sprite)
+            && sStorage->itemIcons[i].sprite == sprite)
             return i;
     }
     return MAX_ITEM_ICONS;
