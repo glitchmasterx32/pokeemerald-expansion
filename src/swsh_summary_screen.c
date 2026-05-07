@@ -156,7 +156,7 @@ enum SwShSummarySprites
     SPRITE_ARR_ID_SPD_GRADE,
     SPRITE_ARR_ID_SPE_GRADE,
     SPRITE_ARR_ID_RELEARN_PROMPT,
-    SPRITE_ARR_ID_RELEARN_PROMPT_SWITCH,
+    SPRITE_ARR_ID_RELEARN_MODE,
     SPRITE_ARR_ID_LR_BUTTON,
     SPRITE_ARR_ID_INFO_PROMPT,
     SPRITE_ARR_ID_TERA_TYPE,
@@ -545,6 +545,9 @@ static const u8 sButtons_Gfx[][4 * TILE_SIZE_4BPP] = {
     INCBIN_U8("graphics/summary_screen/swsh/start_button.4bpp"),
 };
 
+static const u16 sCategoryIcons_Pal[]               = INCBIN_U16("graphics/summary_screen/swsh/category_icons.gbapal");
+static const u16 sGenderIcons_Pal[]                 = INCBIN_U16("graphics/summary_screen/swsh/gender_icons.gbapal");
+static const u16 sHeldItemBox_Pal[]                 = INCBIN_U16("graphics/summary_screen/swsh/held_item_box.gbapal");
 #if SWSH_SUMMARY_SWSH_TYPE_ICONS == TRUE
     static const u32 sMoveTypes_Gfx[] = INCBIN_U32("graphics/summary_screen/swsh/move_types.4bpp.smol");
     #if SWSH_SUMMARY_SWSH_TYPE_ICONS_SV_PAL == TRUE
@@ -554,29 +557,28 @@ static const u8 sButtons_Gfx[][4 * TILE_SIZE_4BPP] = {
     #endif
 #endif
 static const u32 sTeraTypes_Gfx[]                   = INCBIN_U32("graphics/summary_screen/swsh/tera_types.4bpp.smol");
+// Share sHeldItemBox_Pal
 static const u32 sHeldItemBox_Gfx[]                 = INCBIN_U32("graphics/summary_screen/swsh/held_item_box.4bpp.smol");
-static const u16 sHeldItemBox_Pal[]                 = INCBIN_U16("graphics/summary_screen/swsh/held_item_box.gbapal");
 static const u32 sAbilityBox_Gfx[]                  = INCBIN_U32("graphics/summary_screen/swsh/ability_box.4bpp.smol");
-static const u32 sMoveCursor_Gfx[]                  = INCBIN_U32("graphics/summary_screen/swsh/move_cursor.4bpp.smol");
-static const u32 sMoveFrame_Gfx[]                   = INCBIN_U32("graphics/summary_screen/swsh/move_frame.4bpp.smol");
-static const u32 sShinyIcon_Gfx[]                   = INCBIN_U32("graphics/summary_screen/swsh/shiny_icon.4bpp.smol");
-static const u32 sPokerusCuredIcon_Gfx[]            = INCBIN_U32("graphics/summary_screen/swsh/pokerus_cured_icon.4bpp.smol");
-static const u32 sGenderGfx_Icons[]                 = INCBIN_U32("graphics/summary_screen/swsh/gender_icons.4bpp.smol");
-static const u16 sCategoryIcons_Pal[]               = INCBIN_U16("graphics/summary_screen/swsh/category_icons.gbapal");
-static const u32 sCategoryIcons_Gfx[]               = INCBIN_U32("graphics/summary_screen/swsh/category_icons.4bpp.smol");
-static const u16 sFriendshipIcon_Pal[]              = INCBIN_U16("graphics/summary_screen/swsh/heart.gbapal");
-static const u32 sFriendshipIcon_Gfx[]              = INCBIN_U32("graphics/summary_screen/swsh/heart.4bpp.smol");
-static const u32 sMoveSlot_Gfx[]                    = INCBIN_U32("graphics/summary_screen/swsh/move_slot.4bpp.smol");
-static const u16 sMoveSlot_Pal[]                    = INCBIN_U16("graphics/summary_screen/swsh/move_slot.gbapal");
-// rave note: yeah I know doing this with a sprite is mad jank, but I promise I have my reasons
-// mont note: it is maaad jank, but it works, we promise
-static const u32 sRelearnPrompt_Gfx[]               = INCBIN_U32("graphics/summary_screen/swsh/relearn_prompt.4bpp.smol");
-static const u32 sRelearnPromptSwitch_Gfx[]         = INCBIN_U32("graphics/summary_screen/swsh/relearn_prompt_switch.4bpp.smol");
-static const u32 sLRButton_Gfx[]                    = INCBIN_U32("graphics/summary_screen/swsh/lr_button.4bpp.smol");
-static const u32 sInfoPrompt_Gfx[]                  = INCBIN_U32("graphics/summary_screen/swsh/info_prompt.4bpp.smol");
 static const u32 sDynamaxBox_Gfx[]                  = INCBIN_U32("graphics/summary_screen/swsh/dynamax_box.4bpp.smol");
 static const u32 sDynamaxLevels_Gfx[]               = INCBIN_U32("graphics/summary_screen/swsh/dynamax_levels.4bpp.smol");
+static const u32 sMoveCursor_Gfx[]                  = INCBIN_U32("graphics/summary_screen/swsh/move_cursor.4bpp.smol");
+static const u32 sMoveFrame_Gfx[]                   = INCBIN_U32("graphics/summary_screen/swsh/move_frame.4bpp.smol");
+// Share sCategoryIcons_Pal
+static const u32 sCategoryIcons_Gfx[]               = INCBIN_U32("graphics/summary_screen/swsh/category_icons.4bpp.smol");
+static const u32 sPokerusCuredIcon_Gfx[]            = INCBIN_U32("graphics/summary_screen/swsh/pokerus_cured_icon.4bpp.smol");
+static const u32 sShinyIcon_Gfx[]                   = INCBIN_U32("graphics/summary_screen/swsh/shiny_icon.4bpp.smol");
+// rave note: yeah I know doing this with a sprite is mad jank, but I promise I have my reasons
+// mont note: it is maaad jank, but it works, we promise
+static const u32 sInfoPrompt_Gfx[]                  = INCBIN_U32("graphics/summary_screen/swsh/info_prompt.4bpp.smol");
+static const u32 sLRButton_Gfx[]                    = INCBIN_U32("graphics/summary_screen/swsh/lr_button.4bpp.smol");
+static const u32 sRelearnMode_Gfx[]                 = INCBIN_U32("graphics/summary_screen/swsh/relearn_mode.4bpp.smol");
+static const u32 sRelearnPrompt_Gfx[]               = INCBIN_U32("graphics/summary_screen/swsh/relearn_prompt.4bpp.smol");
+// Share sGenderIcons_Pal
+static const u32 sGenderIcons_Gfx[]                 = INCBIN_U32("graphics/summary_screen/swsh/gender_icons.4bpp.smol");
+static const u32 sFriendshipIcon_Gfx[]              = INCBIN_U32("graphics/summary_screen/swsh/heart.4bpp.smol");
 static const u32 sGigantamaxIcon_Gfx[]              = INCBIN_U32("graphics/summary_screen/swsh/gigantamax.4bpp.smol");
+static const u32 sMoveSlot_Gfx[]                    = INCBIN_U32("graphics/summary_screen/swsh/move_slot.4bpp.smol");
 
 #if SWSH_SUMMARY_SWSH_STATUS_ICONS == TRUE
 static const u32 sStatusGfx_Icons[]                 = INCBIN_U32("graphics/summary_screen/swsh/status_icons.4bpp.smol");
@@ -855,7 +857,7 @@ static void (*const sTextPrinterTasks[])(u8 taskId) =
 #define TAG_TERA_TYPE 30010
 #define TAG_MON_SHADOW 30011
 #define TAG_RELEARN_PROMPT 30012
-#define TAG_RELEARN_PROMPT_SWITCH 30013
+#define TAG_RELEARN_MODE 30013
 #define TAG_INFO_PROMPT 30014
 #define TAG_GENDER_ICON 30015
 #define TAG_HELD_ITEM_BOX 30016
@@ -865,10 +867,8 @@ static void (*const sTextPrinterTasks[])(u8 taskId) =
 #define TAG_DYNAMAX_BOX 30020
 #define TAG_DYNAMAX_LEVELS 30021
 #define TAG_MOVE_SLOT 30022
-#define TAG_MOVE_SLOT_NORMAL 30023
-#define TAG_MOVE_SLOT_HOVER 30024
-#define TAG_MOVE_CURSOR 30025
-#define TAG_MOVE_FRAME 30026
+#define TAG_MOVE_CURSOR 30023
+#define TAG_MOVE_FRAME 30024
 
 enum SwShCategoryIcon
 {
@@ -991,58 +991,58 @@ static const struct SpriteTemplate sSpriteTemplate_RelearnPrompt =
     .oam = &sOamData_RelearnPrompt,
 };
 
-static const struct OamData sOamData_RelearnPromptSwitch =
+static const struct OamData sOamData_RelearnMode =
 {
     .size = SPRITE_SIZE(32x16),
     .shape = SPRITE_SHAPE(32x16),
     .priority = 0,
 };
 
-static const struct CompressedSpriteSheet sSpriteSheet_RelearnPromptSwitch =
+static const struct CompressedSpriteSheet sSpriteSheet_RelearnMode =
 {
-    .data = sRelearnPromptSwitch_Gfx,
+    .data = sRelearnMode_Gfx,
     .size = 32*16*4/2,
-    .tag = TAG_RELEARN_PROMPT_SWITCH,
+    .tag = TAG_RELEARN_MODE,
 };
 
-static const union AnimCmd sSpriteAnim_RelearnPromptSwitchLevel[] =
+static const union AnimCmd sSpriteAnim_RelearnModeLevel[] =
 {
     ANIMCMD_FRAME(0, 0),
     ANIMCMD_END
 };
 
-static const union AnimCmd sSpriteAnim_RelearnPromptSwitchEgg[] =
+static const union AnimCmd sSpriteAnim_RelearnModeEgg[] =
 {
     ANIMCMD_FRAME(8, 0),
     ANIMCMD_END
 };
 
-static const union AnimCmd sSpriteAnim_RelearnPromptSwitchTM[] =
+static const union AnimCmd sSpriteAnim_RelearnModeTM[] =
 {
     ANIMCMD_FRAME(16, 0),
     ANIMCMD_END
 };
 
-static const union AnimCmd sSpriteAnim_RelearnPromptSwitchTutor[] =
+static const union AnimCmd sSpriteAnim_RelearnModeTutor[] =
 {
     ANIMCMD_FRAME(24, 0),
     ANIMCMD_END
 };
 
-static const union AnimCmd *const sSpriteAnimTable_RelearnPromptSwitch[] =
+static const union AnimCmd *const sSpriteAnimTable_RelearnMode[] =
 {
-    sSpriteAnim_RelearnPromptSwitchLevel,
-    sSpriteAnim_RelearnPromptSwitchEgg,
-    sSpriteAnim_RelearnPromptSwitchTM,
-    sSpriteAnim_RelearnPromptSwitchTutor,
+    sSpriteAnim_RelearnModeLevel,
+    sSpriteAnim_RelearnModeEgg,
+    sSpriteAnim_RelearnModeTM,
+    sSpriteAnim_RelearnModeTutor,
 };
 
-static const struct SpriteTemplate sSpriteTemplate_RelearnPromptSwitch =
+static const struct SpriteTemplate sSpriteTemplate_RelearnMode =
 {
-    .tileTag = TAG_RELEARN_PROMPT_SWITCH,
+    .tileTag = TAG_RELEARN_MODE,
     .paletteTag = TAG_CATEGORY_ICONS,
-    .oam = &sOamData_RelearnPromptSwitch,
-    .anims = sSpriteAnimTable_RelearnPromptSwitch,
+    .oam = &sOamData_RelearnMode,
+    .anims = sSpriteAnimTable_RelearnMode,
 };
 
 static const struct OamData sOamData_LRButton =
@@ -1125,12 +1125,6 @@ static const struct CompressedSpriteSheet sSpriteSheet_FriendshipIcon =
     .tag = TAG_FRIENDSHIP_ICON,
 };
 
-static const struct SpritePalette sSpritePal_FriendshipIcon =
-{
-    .data = sFriendshipIcon_Pal,
-    .tag = TAG_FRIENDSHIP_ICON
-};
-
 static const union AnimCmd sSpriteAnim_FriendshipIcon0[] = {
     ANIMCMD_FRAME(FRIENDSHIP_LEVEL_0, 0, FALSE, FALSE),
     ANIMCMD_END
@@ -1173,7 +1167,7 @@ static const union AnimCmd *const sSpriteAnimTable_FriendshipIcon[FRIENDSHIP_LEV
 static const struct SpriteTemplate sSpriteTemplate_FriendshipIcon =
 {
     .tileTag = TAG_FRIENDSHIP_ICON,
-    .paletteTag = TAG_FRIENDSHIP_ICON,
+    .paletteTag = TAG_GENDER_ICON,
     .oam = &sOamData_FriendshipIcon,
     .anims = sSpriteAnimTable_FriendshipIcon,
 };
@@ -1508,30 +1502,17 @@ static const union AnimCmd *const sSpriteAnimTable_MoveSlot[] = {
 
 static const u8 sMoveSlotAnims[MOVE_SLOT_SPRITES_COUNT] = {0, 1, 1, 2, 3};
 
-static const struct CompressedSpriteSheet sMoveSlotSpriteSheet =
+static const struct CompressedSpriteSheet sSpriteSheet_MoveSlot =
 {
     .data = sMoveSlot_Gfx,
     .size = (32 * 16 * 4) / 2,
     .tag = TAG_MOVE_SLOT
 };
 
-static const struct SpritePalette sMoveSlotPalettes[] =
-{
-    {
-        .data = sMoveSlot_Pal,
-        .tag = TAG_MOVE_SLOT_NORMAL,
-    },
-    {
-        .data = sMoveSlot_Pal + 16,
-        .tag = TAG_MOVE_SLOT_HOVER,
-    },
-    {},
-};
-
 static const struct SpriteTemplate sMoveSlotSpriteTemplate =
 {
     .tileTag = TAG_MOVE_SLOT,
-    .paletteTag = TAG_MOVE_SLOT_NORMAL,
+    .paletteTag = TAG_GENDER_ICON,
     .oam = &sOamData_MoveSlot,
     .anims = sSpriteAnimTable_MoveSlot,
 };
@@ -1553,7 +1534,7 @@ static const struct OamData sOamData_MoveCursor =
     .affineParam = 0,
 };
 
-static const struct CompressedSpriteSheet sMoveCursorSpriteSheet =
+static const struct CompressedSpriteSheet sSpriteSheet_MoveCursor =
 {
     .data = sMoveCursor_Gfx,
     .size = (16 * 16) / 2,
@@ -1609,7 +1590,7 @@ static const u8 sMoveFrameAnims[MOVE_FRAME_SPRITES_COUNT] = {
     [9] = 2
 };
 
-static const struct CompressedSpriteSheet sMoveFrameSpriteSheet =
+static const struct CompressedSpriteSheet sSpriteSheet_MoveFrame =
 {
     .data = sMoveFrame_Gfx,
     .size = (16 * 32 * 3) / 2,
@@ -1740,12 +1721,6 @@ static const struct CompressedSpriteSheet sSpriteSheet_AbilityBox =
 {
     .data = sAbilityBox_Gfx,
     .size = (32 * 16 * 4) / 2,
-    .tag = TAG_ABILITY_BOX,
-};
-
-static const struct SpritePalette sSpritePal_AbilityBox =
-{
-    .data = sHeldItemBox_Pal,
     .tag = TAG_ABILITY_BOX,
 };
 
@@ -1987,8 +1962,7 @@ static const union AnimCmd *const sSpriteAnimTable_StatusCondition[] = {
     sSpriteAnim_StatusFrostbite,
 };
 
-
-static const struct CompressedSpriteSheet sStatusIconsSpriteSheet =
+static const struct CompressedSpriteSheet sSpriteSheet_StatusIcons =
 {
 #if SWSH_SUMMARY_SWSH_STATUS_ICONS == TRUE
     .data = sStatusGfx_Icons,
@@ -1999,7 +1973,7 @@ static const struct CompressedSpriteSheet sStatusIconsSpriteSheet =
     .tag = TAG_MON_STATUS
 };
 
-static const struct SpritePalette sStatusIconsSpritePalette =
+static const struct SpritePalette sSpritePal_StatusIcons =
 {
 #if SWSH_SUMMARY_SWSH_STATUS_ICONS == TRUE
     .data = sStatusPal_Icons,
@@ -2017,7 +1991,7 @@ static const struct SpriteTemplate sSpriteTemplate_StatusCondition =
     .anims = sSpriteAnimTable_StatusCondition,
 };
 
-static const struct OamData sOamData_Gender =
+static const struct OamData sOamData_GenderIcons =
 {
     .y = 0,
     .affineMode = ST_OAM_AFFINE_OFF,
@@ -2044,24 +2018,30 @@ static const union AnimCmd sSpriteAnim_Male[] = {
     ANIMCMD_END
 };
 
-static const union AnimCmd *const sSpriteAnimTable_Gender[] = {
+static const union AnimCmd *const sSpriteAnimTable_GenderIcons[] = {
     sSpriteAnim_Female,
     sSpriteAnim_Male,
 };
 
-static const struct CompressedSpriteSheet sGenderIconsSpriteSheet =
+static const struct CompressedSpriteSheet sSpriteSheet_GenderIcons =
 {
-    .data = sGenderGfx_Icons,
+    .data = sGenderIcons_Gfx,
     .size = 0x200,
     .tag = TAG_GENDER_ICON
 };
 
-static const struct SpriteTemplate sSpriteTemplate_Gender =
+static const struct SpritePalette sSpritePal_GenderIcons =
+{
+    .data = sGenderIcons_Pal,
+    .tag = TAG_GENDER_ICON
+};
+
+static const struct SpriteTemplate sSpriteTemplate_GenderIcons =
 {
     .tileTag = TAG_GENDER_ICON,
-    .paletteTag = TAG_FRIENDSHIP_ICON,
-    .oam = &sOamData_Gender,
-    .anims = sSpriteAnimTable_Gender,
+    .paletteTag = TAG_GENDER_ICON,
+    .oam = &sOamData_GenderIcons,
+    .anims = sSpriteAnimTable_GenderIcons,
 };
 
 static const struct OamData sOamData_ShinyIcon =
@@ -2081,7 +2061,7 @@ static const struct OamData sOamData_ShinyIcon =
     .affineParam = 0,
 };
 
-static const struct CompressedSpriteSheet sShinyIconSpriteSheet =
+static const struct CompressedSpriteSheet sSpriteSheet_ShinyIcon =
 {
     .data = sShinyIcon_Gfx,
     .size = 8*8/2,
@@ -2112,7 +2092,7 @@ static const struct OamData sOamData_GigantamaxIcon =
     .affineParam = 0,
 };
 
-static const struct CompressedSpriteSheet sGigantamaxIconSpriteSheet =
+static const struct CompressedSpriteSheet sSpriteSheet_GigantamaxIcon =
 {
     .data = sGigantamaxIcon_Gfx,
     .size = (16*16)/2,
@@ -2143,7 +2123,7 @@ static const struct OamData sOamData_PokerusCuredIcon =
     .affineParam = 0,
 };
 
-static const struct CompressedSpriteSheet sPokerusCuredIconSpriteSheet =
+static const struct CompressedSpriteSheet sSpriteSheet_PokerusCuredIcon =
 {
     .data = sPokerusCuredIcon_Gfx,
     .size = 8*8,
@@ -2544,23 +2524,23 @@ static bool8 DecompressGraphics(void)
         sMonSummaryScreen->switchCounter++;
         break;
     case 9:
-        LoadCompressedSpriteSheet(&sMoveCursorSpriteSheet);
+        LoadCompressedSpriteSheet(&sSpriteSheet_MoveCursor);
         sMonSummaryScreen->switchCounter++;
         break;
     case 10:
-        LoadCompressedSpriteSheet(&sMoveFrameSpriteSheet);
+        LoadCompressedSpriteSheet(&sSpriteSheet_MoveFrame);
         sMonSummaryScreen->switchCounter++;
         break;
     case 11:
-        LoadCompressedSpriteSheet(&sStatusIconsSpriteSheet);
+        LoadCompressedSpriteSheet(&sSpriteSheet_StatusIcons);
         sMonSummaryScreen->switchCounter++;
         break;
     case 12:
-        LoadSpritePalette(&sStatusIconsSpritePalette);
+        LoadSpritePalette(&sSpritePal_StatusIcons);
         sMonSummaryScreen->switchCounter++;
         break;
     case 13:
-        LoadCompressedSpriteSheet(&sShinyIconSpriteSheet);
+        LoadCompressedSpriteSheet(&sSpriteSheet_ShinyIcon);
         sMonSummaryScreen->switchCounter++;
         break;
     case 14:
@@ -2568,7 +2548,7 @@ static bool8 DecompressGraphics(void)
         sMonSummaryScreen->switchCounter++;
         break;
     case 15:
-        LoadCompressedSpriteSheet(&sPokerusCuredIconSpriteSheet);
+        LoadCompressedSpriteSheet(&sSpriteSheet_PokerusCuredIcon);
         sMonSummaryScreen->switchCounter++;
         break;
     case 16:
@@ -2583,7 +2563,7 @@ static bool8 DecompressGraphics(void)
         break;
     case 18:
         if (SWSH_SUMMARY_SHOW_FRIENDSHIP)
-            LoadSpritePalette(&sSpritePal_FriendshipIcon);
+            LoadSpritePalette(&sSpritePal_GenderIcons);
         sMonSummaryScreen->switchCounter++;
         break;
     case 19:
@@ -2596,7 +2576,7 @@ static bool8 DecompressGraphics(void)
         break;
     case 20:
         if (SWSH_SUMMARY_SHOW_GIGANTAMAX)
-            LoadCompressedSpriteSheet(&sGigantamaxIconSpriteSheet);
+            LoadCompressedSpriteSheet(&sSpriteSheet_GigantamaxIcon);
         sMonSummaryScreen->switchCounter++;
         break;
     case 21:
@@ -2615,7 +2595,7 @@ static bool8 DecompressGraphics(void)
         break;
     case 24:
         if (P_SUMMARY_SCREEN_MOVE_RELEARNER)
-            LoadCompressedSpriteSheet(&sSpriteSheet_RelearnPromptSwitch);
+            LoadCompressedSpriteSheet(&sSpriteSheet_RelearnMode);
         sMonSummaryScreen->switchCounter++;
         break;
     case 25:
@@ -2646,15 +2626,7 @@ static bool8 DecompressGraphics(void)
         sMonSummaryScreen->switchCounter++;
         break;
     case 31:
-        LoadCompressedSpriteSheet(&sMoveSlotSpriteSheet);
-        sMonSummaryScreen->switchCounter++;
-        break;
-    case 32:
-        LoadSpritePalette(&sMoveSlotPalettes[0]);
-        sMonSummaryScreen->switchCounter++;
-        break;
-    case 33:
-        LoadSpritePalette(&sMoveSlotPalettes[1]);
+        LoadCompressedSpriteSheet(&sSpriteSheet_MoveSlot);
         sMonSummaryScreen->switchCounter = 0;
         return TRUE;
     }
@@ -4122,7 +4094,7 @@ static void LoadGenderGfx(void)
 {
     if (GetSpriteTileStartByTag(TAG_GENDER_ICON) == 0xFFFF)
     {
-        LoadCompressedSpriteSheet(&sGenderIconsSpriteSheet);
+        LoadCompressedSpriteSheet(&sSpriteSheet_GenderIcons);
     }
 }
 
@@ -4134,7 +4106,7 @@ static void CreateGenderSprite(struct Pokemon *mon, u16 species)
     if (*spriteId == SPRITE_NONE)
     {
         LoadGenderGfx();
-        *spriteId = CreateSprite(&sSpriteTemplate_Gender, 231, 17, 6);
+        *spriteId = CreateSprite(&sSpriteTemplate_GenderIcons, 231, 17, 6);
     }
 
     if (species != SPECIES_NIDORAN_M && species != SPECIES_NIDORAN_F && !sMonSummaryScreen->summary.isEgg)
@@ -6156,8 +6128,8 @@ static void UpdateMoveSlotVisibility(void)
 static void UpdateMoveSlotPalette(void)
 {
     u8 slot, i;
-    u8 normalPalSlot = IndexOfSpritePaletteTag(TAG_MOVE_SLOT_NORMAL);
-    u8 hoverPalSlot = IndexOfSpritePaletteTag(TAG_MOVE_SLOT_HOVER);
+    u8 normalPalSlot = IndexOfSpritePaletteTag(TAG_GENDER_ICON);
+    u8 hoverPalSlot = IndexOfSpritePaletteTag(TAG_HELD_ITEM_BOX);
     bool8 cursorActive = (sMonSummaryScreen->spriteIds[SPRITE_ARR_ID_MOVE_CURSOR] != SPRITE_NONE);
     bool8 frameActive = (sMonSummaryScreen->spriteIds[SPRITE_ARR_ID_MOVE_FRAME] != SPRITE_NONE);
 
@@ -6342,14 +6314,14 @@ static void ShowMoveRelearner(void)
     if (sMonSummaryScreen->spriteIds[SPRITE_ARR_ID_RELEARN_PROMPT] == SPRITE_NONE)
     {
         sMonSummaryScreen->spriteIds[SPRITE_ARR_ID_RELEARN_PROMPT] = CreateSprite(&sSpriteTemplate_RelearnPrompt, 144, 164, 0);
-        sMonSummaryScreen->spriteIds[SPRITE_ARR_ID_RELEARN_PROMPT_SWITCH] = CreateSprite(&sSpriteTemplate_RelearnPromptSwitch, 192, 156, 0);
+        sMonSummaryScreen->spriteIds[SPRITE_ARR_ID_RELEARN_MODE] = CreateSprite(&sSpriteTemplate_RelearnMode, 192, 156, 0);
         sMonSummaryScreen->spriteIds[SPRITE_ARR_ID_LR_BUTTON] = CreateSprite(&sSpriteTemplate_LRButton, 102, 152, 0);
     }
 
     gSprites[sMonSummaryScreen->spriteIds[SPRITE_ARR_ID_RELEARN_PROMPT]].invisible = FALSE;
-    gSprites[sMonSummaryScreen->spriteIds[SPRITE_ARR_ID_RELEARN_PROMPT_SWITCH]].invisible = FALSE;
+    gSprites[sMonSummaryScreen->spriteIds[SPRITE_ARR_ID_RELEARN_MODE]].invisible = FALSE;
     gSprites[sMonSummaryScreen->spriteIds[SPRITE_ARR_ID_LR_BUTTON]].invisible = FALSE;
-    StartSpriteAnim(&gSprites[sMonSummaryScreen->spriteIds[SPRITE_ARR_ID_RELEARN_PROMPT_SWITCH]], gMoveRelearnerState);
+    StartSpriteAnim(&gSprites[sMonSummaryScreen->spriteIds[SPRITE_ARR_ID_RELEARN_MODE]], gMoveRelearnerState);
 }
 
 static void HideMoveRelearner(void)
@@ -6357,7 +6329,7 @@ static void HideMoveRelearner(void)
     if (sMonSummaryScreen->spriteIds[SPRITE_ARR_ID_RELEARN_PROMPT] != SPRITE_NONE)
     {
         gSprites[sMonSummaryScreen->spriteIds[SPRITE_ARR_ID_RELEARN_PROMPT]].invisible = TRUE;
-        gSprites[sMonSummaryScreen->spriteIds[SPRITE_ARR_ID_RELEARN_PROMPT_SWITCH]].invisible = TRUE;
+        gSprites[sMonSummaryScreen->spriteIds[SPRITE_ARR_ID_RELEARN_MODE]].invisible = TRUE;
         gSprites[sMonSummaryScreen->spriteIds[SPRITE_ARR_ID_LR_BUTTON]].invisible = TRUE;
     }
 }
