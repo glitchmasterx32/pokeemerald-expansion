@@ -81,17 +81,13 @@ enum {
 
 // IDs for messages to print with PrintMessage
 enum {
-    MSG_EXIT_BOX,
-    MSG_WHAT_YOU_DO,
     MSG_IS_SELECTED,
     MSG_JUMP_TO_WHICH_BOX,
     MSG_DEPOSIT_IN_WHICH_BOX,
-    MSG_WAS_DEPOSITED,
     MSG_BOX_IS_FULL,
     MSG_RELEASE_POKE,
     MSG_WAS_RELEASED,
     MSG_BYE_BYE,
-    MSG_MARK_POKE,
     MSG_LAST_POKE,
     MSG_PARTY_FULL,
     MSG_HOLDING_POKE,
@@ -176,7 +172,6 @@ enum {
     INPUT_MOVE_CURSOR,
     INPUT_2, // Unused
     INPUT_3, // Unused
-    INPUT_CLOSE_BOX,
     INPUT_SHOW_PARTY,
     INPUT_HIDE_PARTY,
     INPUT_BOX_OPTIONS,
@@ -593,7 +588,6 @@ static void Task_ShowPokeStorage(u8);
 static void Task_OnBPressed(u8);
 static void Task_HandleBoxOptions(u8);
 static void Task_OnSelectedMon(u8);
-static void Task_OnCloseBoxPressed(u8);
 static void Task_HidePartyPokemon(u8);
 static void Task_DepositMon(u8);
 static void Task_MoveMon(u8);
@@ -1690,9 +1684,6 @@ static void Task_PokeStorageMain(u8 taskId)
                 SetPokeStorageTask(Task_HidePartyPokemon);
             }
             break;
-        case INPUT_CLOSE_BOX:
-            SetPokeStorageTask(Task_OnCloseBoxPressed);
-            break;
         case INPUT_PRESSED_B:
             SetPokeStorageTask(Task_OnBPressed);
             break;
@@ -2081,6 +2072,7 @@ static void Task_OnSelectedMon(u8 taskId)
             break;
         case MENU_MARK:
             PlaySE(SE_SELECT);
+            ClearBottomWindow();
             SetPokeStorageTask(Task_ShowMarkMenu);
             break;
         case MENU_TAKE:
@@ -2547,7 +2539,6 @@ static void Task_ShowMarkMenu(u8 taskId)
     switch (sStorage->state)
     {
     case 0:
-        PrintMessage(MSG_MARK_POKE);
         sStorage->markMenu.markings = sStorage->displayMon.markings;
         OpenMonMarkingsMenu(sStorage->displayMon.markings, 0xb0, 0x10);
         sStorage->state++;
@@ -2556,7 +2547,6 @@ static void Task_ShowMarkMenu(u8 taskId)
         if (!HandleMonMarkingsMenuInput())
         {
             FreeMonMarkingsMenu();
-            ClearBottomWindow();
             SetMonMarkings(sStorage->markMenu.markings);
             RefreshDisplayMonData();
             SetPokeStorageTask(Task_PokeStorageMain);
@@ -2878,7 +2868,6 @@ static void Task_HandleBoxOptions(u8 taskId)
     switch (sStorage->state)
     {
     case 0:
-        PrintMessage(MSG_WHAT_YOU_DO);
         AddMenu();
         sStorage->state++;
         break;
@@ -2891,7 +2880,6 @@ static void Task_HandleBoxOptions(u8 taskId)
         {
         case MENU_B_PRESSED:
         case MENU_CANCEL:
-            ClearBottomWindow();
             SetPokeStorageTask(Task_PokeStorageMain);
             break;
         case MENU_NAME:
@@ -2900,12 +2888,10 @@ static void Task_HandleBoxOptions(u8 taskId)
             break;
         case MENU_WALLPAPER:
             PlaySE(SE_SELECT);
-            ClearBottomWindow();
             SetPokeStorageTask(Task_HandleWallpapers);
             break;
         case MENU_JUMP:
             PlaySE(SE_SELECT);
-            ClearBottomWindow();
             SetPokeStorageTask(Task_JumpBox);
             break;
         }
@@ -3086,72 +3072,6 @@ static void Task_GiveItemFromBag(u8 taskId)
             sStorage->screenChangeType = SCREEN_CHANGE_ITEM_FROM_BAG;
             SetPokeStorageTask(Task_ChangeScreen);
             sJustOpenedBag = TRUE;
-        }
-        break;
-    }
-}
-
-static void Task_OnCloseBoxPressed(u8 taskId)
-{
-    switch (sStorage->state)
-    {
-    case 0:
-        if (IsMonBeingMoved())
-        {
-            PlaySE(SE_FAILURE);
-            PrintMessage(MSG_HOLDING_POKE);
-            sStorage->state = 1;
-        }
-        else if (IsMovingItem())
-        {
-            SetPokeStorageTask(Task_CloseBoxWhileHoldingItem);
-        }
-        else
-        {
-            PlaySE(SE_SELECT);
-            PrintMessage(MSG_EXIT_BOX);
-            ShowYesNoWindow(0);
-            sStorage->state = 2;
-        }
-        break;
-    case 1:
-        if (JOY_NEW(A_BUTTON | B_BUTTON | DPAD_ANY))
-        {
-            ClearBottomWindow();
-            SetPokeStorageTask(Task_PokeStorageMain);
-        }
-        break;
-    case 2:
-        switch (Menu_ProcessInputNoWrapClearOnChoose())
-        {
-        case MENU_B_PRESSED:
-        case 1:
-            ClearBottomWindow();
-            SetPokeStorageTask(Task_PokeStorageMain);
-            break;
-        case 0:
-            PlaySE(SE_PC_OFF);
-            ClearBottomWindow();
-            sStorage->state++;
-            break;
-        }
-        break;
-    case 3:
-        ComputerScreenCloseEffect(20, 0, 1);
-        sStorage->state++;
-        break;
-    case 4:
-        if (!IsComputerScreenCloseEffectActive())
-        {
-            UpdateBoxToSendMons();
-            gPlayerPartyCount = CalculatePlayerPartyCount();
-            if (sStorage->boxOption == OPTION_SELECT_MON)
-            {
-                gSpecialVar_0x8004 = PARTY_NOTHING_CHOSEN;
-                gSpecialVar_Result = FALSE;
-            }
-            sStorage->screenChangeType = SCREEN_CHANGE_EXIT_BOX;
-            SetPokeStorageTask(Task_ChangeScreen);
         }
         break;
     }
@@ -7208,12 +7128,7 @@ static u8 HandleInput_InParty(void)
 
         if (JOY_NEW(A_BUTTON))
         {
-            if (sCursorPosition == PARTY_SIZE)
-            {
-                if (sStorage->boxOption == OPTION_DEPOSIT)
-                    return INPUT_CLOSE_BOX;
-            }
-            else if (SetSelectionMenuTexts())
+            if (SetSelectionMenuTexts())
             {
                 if (sCursorMode == CURSOR_MODE_NORMAL)
                     return INPUT_IN_MENU;
