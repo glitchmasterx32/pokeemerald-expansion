@@ -422,6 +422,16 @@ struct DisplayMonInfo
     u8 itemNameText[36];
 };
 
+struct MarkingsMenuSwSh
+{
+    u8 markings; // bit flags
+    s8 cursorPos; // 0-3 for the 4 markings
+    bool8 markingsArray[NUM_MON_MARKINGS];
+    struct Sprite *windowSprites[3]; // left, middle, right
+    struct Sprite *markingSprites[NUM_MON_MARKINGS];
+    struct Sprite *cursorSprite;
+};
+
 struct PokemonStorageSystemData
 {
     u8 state;
@@ -508,7 +518,7 @@ struct PokemonStorageSystemData
     u8 shiftBoxId;
     struct Sprite *markingComboSprite;
     u16 *markingComboTilesPtr;
-    struct MonMarkingsMenu markMenu;
+    struct MarkingsMenuSwSh markMenuSwSh; // SwSh-style horizontal marking menu
     struct ChooseBoxMenu chooseBoxMenu;
     struct Pokemon movingMon;
     struct Pokemon tempMon;
@@ -580,6 +590,7 @@ EWRAM_DATA static u8 sMovingMonOrigBoxPos = 0;
 EWRAM_DATA static u8 sCursorMode = 0;
 EWRAM_DATA static bool8 sJustOpenedBag = 0;
 EWRAM_DATA static bool8 sRefreshDisplayMonGfx = FALSE;
+EWRAM_DATA static struct MarkingsMenuSwSh *sMarkMenu = NULL;
 
 // Main tasks
 static void Task_InitPokeStorage(u8);
@@ -1563,14 +1574,7 @@ static void Task_InitPokeStorage(u8 taskId)
         if (IsInitBoxActive())
             return;
 
-        if (sStorage->boxOption != OPTION_MOVE_ITEMS)
-        {
-            sStorage->markMenu.baseTileTag = GFXTAG_MARKING_MENU;
-            sStorage->markMenu.basePaletteTag = PALTAG_MARKING_MENU;
-            InitMonMarkingsMenu(&sStorage->markMenu);
-            BufferMonMarkingsMenuTiles();
-        }
-        else
+        if (sStorage->boxOption == OPTION_MOVE_ITEMS)
         {
             CreateItemIconSprites();
             InitCursorItemIcon();
@@ -2542,22 +2546,155 @@ static void Task_ReleaseMon(u8 taskId)
     }
 }
 
+// ============================================================================
+// SwSh-style horizontal markings menu
+// ============================================================================
+
+static void OpenMonMarkingsMenu_SwSh(u8 markings, s16 x, s16 y)
+{
+    u8 i, spriteId;
+
+    sMarkMenu->cursorPos = 0;
+    sMarkMenu->markings = markings;
+    for (i = 0; i < NUM_MON_MARKINGS; i++)
+        sMarkMenu->markingsArray[i] = (markings >> i) & 1;
+
+    LoadCompressedSpriteSheet(&sSpriteSheet_MarkingsMenu);
+
+    // create menu window
+    for (i = 0; i < 3; i++)
+    {
+        spriteId = CreateSprite(&sSpriteTemplate_MarkingsMenu_Window, x + i * 32, y, 3);
+        if (spriteId != MAX_SPRITES)
+        {
+            sMarkMenu->windowSprites[i] = &gSprites[spriteId];
+            StartSpriteAnim(&gSprites[spriteId], sMarkingsMenu_WindowAnims[i]);
+        }
+        else
+        {
+            sMarkMenu->windowSprites[i] = NULL;
+        }
+    }
+
+    // create marks
+    for (i = 0; i < NUM_MON_MARKINGS; i++)
+    {
+        spriteId = CreateSprite(&sSpriteTemplate_MarkingsMenu_Marks, 108 + i * 24, 80, 2);
+        if (spriteId != MAX_SPRITES)
+        {
+            sMarkMenu->markingSprites[i] = &gSprites[spriteId];
+            StartSpriteAnim(&gSprites[spriteId], i * 2 + sMarkMenu->markingsArray[i]);
+        }
+        else
+        {
+            sMarkMenu->markingSprites[i] = NULL;
+        }
+    }
+
+    // create cursor
+    spriteId = CreateSprite(&sSpriteTemplate_MarkingsMenu_Cursor, 96, 80, 1);
+    if (spriteId != MAX_SPRITES)
+    {
+        sMarkMenu->cursorSprite = &gSprites[spriteId];
+        StartSpriteAnim(&gSprites[spriteId], 0);
+    }
+    else
+    {
+        sMarkMenu->cursorSprite = NULL;
+    }
+}
+
+static bool8 HandleMonMarkingsMenuInput_SwSh(void)
+{
+    u8 i;
+
+    // cursor movement
+    if (JOY_NEW(DPAD_LEFT))
+    {
+        PlaySE(SE_SELECT);
+        if (--sMarkMenu->cursorPos < 0)
+            sMarkMenu->cursorPos = NUM_MON_MARKINGS - 1;
+        sMarkMenu->cursorSprite->x = 96 + sMarkMenu->cursorPos * 24;
+        return TRUE;
+    }
+    if (JOY_NEW(DPAD_RIGHT))
+    {
+        PlaySE(SE_SELECT);
+        if (++sMarkMenu->cursorPos >= NUM_MON_MARKINGS)
+            sMarkMenu->cursorPos = 0;
+        sMarkMenu->cursorSprite->x = 96 + sMarkMenu->cursorPos * 24;
+        return TRUE;
+    }
+
+    // toggle marking at cursor position
+    if (JOY_NEW(A_BUTTON))
+    {
+        PlaySE(SE_SELECT);
+        sMarkMenu->markingsArray[sMarkMenu->cursorPos] = !sMarkMenu->markingsArray[sMarkMenu->cursorPos];
+        StartSpriteAnim(sMarkMenu->markingSprites[sMarkMenu->cursorPos], 
+                       sMarkMenu->cursorPos * 2 + sMarkMenu->markingsArray[sMarkMenu->cursorPos]);
+        return TRUE;
+    }
+
+    if (JOY_NEW(B_BUTTON))
+    {
+        PlaySE(SE_SELECT);
+        sMarkMenu->markings = 0;
+        for (i = 0; i < NUM_MON_MARKINGS; i++)
+            sMarkMenu->markings |= sMarkMenu->markingsArray[i] << i;
+        
+        return FALSE;
+    }
+
+    return TRUE;
+}
+
+static void FreeMonMarkingsMenu_SwSh(void)
+{
+    u8 i;
+    FreeSpriteTilesByTag(GFXTAG_MARKING_MENU);
+
+    for (i = 0; i < 3; i++)
+    {
+        if (sMarkMenu->windowSprites[i])
+        {
+            DestroySprite(sMarkMenu->windowSprites[i]);
+            sMarkMenu->windowSprites[i] = NULL;
+        }
+    }
+
+    for (i = 0; i < NUM_MON_MARKINGS; i++)
+    {
+        if (sMarkMenu->markingSprites[i])
+        {
+            DestroySprite(sMarkMenu->markingSprites[i]);
+            sMarkMenu->markingSprites[i] = NULL;
+        }
+    }
+
+    if (sMarkMenu->cursorSprite)
+    {
+        DestroySprite(sMarkMenu->cursorSprite);
+        sMarkMenu->cursorSprite = NULL;
+    }
+}
+
 static void Task_ShowMarkMenu(u8 taskId)
 {
     switch (sStorage->state)
     {
     case 0:
-        sStorage->markMenu.markings = sStorage->displayMon.markings;
-        // keeps panel hidden during marking menu (sprites-based menu)
+        sMarkMenu = &sStorage->markMenuSwSh;
+        sMarkMenu->markings = sStorage->displayMon.markings;
         HideInfoPanelSprites();
-        OpenMonMarkingsMenu(sStorage->displayMon.markings, 0xb0, 0x10);
+        OpenMonMarkingsMenu_SwSh(sStorage->displayMon.markings, 112, 80);
         sStorage->state++;
         break;
     case 1:
-        if (!HandleMonMarkingsMenuInput())
+        if (!HandleMonMarkingsMenuInput_SwSh())
         {
-            FreeMonMarkingsMenu();
-            SetMonMarkings(sStorage->markMenu.markings);
+            FreeMonMarkingsMenu_SwSh();
+            SetMonMarkings(sMarkMenu->markings);
             SetPokeStorageTask(Task_PokeStorageMain);
             RefreshDisplayMonData();
         }
@@ -5278,26 +5415,18 @@ static void CreateBoxTitleFrame(u8 boxId)
 
     for (i = 0; i < ARRAY_COUNT(sStorage->boxTitleFrameSprites); i++)
     {
-        u8 animNum;
         s16 spriteX = x;
 
         if (i == 0)
-            animNum = 0;
+            spriteX = x;
         else if (i == ARRAY_COUNT(sStorage->boxTitleFrameSprites) - 1)
-        {
-            animNum = 2;
-            animNum = 2;
             spriteX = x + 16 + (5 * 16);
-        }
         else
-        {
-            animNum = 1;
             spriteX = x + 16 + ((i - 1) * 16);
-        }
 
         u8 spriteId = CreateSprite(&template, spriteX, y, 25);
         sStorage->boxTitleFrameSprites[i] = &gSprites[spriteId];
-        StartSpriteAnim(sStorage->boxTitleFrameSprites[i], animNum);
+        StartSpriteAnim(sStorage->boxTitleFrameSprites[i], sBoxTitleFrameAnims[i]);
     }
 }
 

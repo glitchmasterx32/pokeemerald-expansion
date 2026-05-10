@@ -67,6 +67,7 @@ static const u32 sShinyIcon_Gfx[]             = INCBIN_U32("graphics/pokemon_sto
 static const u32 sStatLabels_Gfx[]            = INCBIN_U32("graphics/pokemon_storage/swsh/stat_labels.4bpp.smol");
 static const ALIGNED(4) u8 sTypeIcons_Gfx[]   = INCBIN_U8("graphics/pokemon_storage/swsh/type_icons.4bpp");
 static const u16 sTypeIcons_Pal[]             = INCBIN_U16("graphics/pokemon_storage/swsh/type_icons.gbapal");
+static const u32 sMarkingsMenu_Gfx[]          = INCBIN_U32("graphics/pokemon_storage/swsh/markings_menu.4bpp.smol");
 static const u16 sMarkings_Pal[]              = INCBIN_U16("graphics/pokemon_storage/swsh/markings.gbapal");
 
 static const u32 sItemInfoFrame_Gfx[]         = INCBIN_U32("graphics/pokemon_storage/swsh/item_info_frame.4bpp");
@@ -610,26 +611,28 @@ static const struct OamData sOamData_BoxTitleFrame =
     .affineParam = 0,
 };
 
-static const union AnimCmd sSpriteAnim_BoxTitleFrameLeft[] = {
+static const union AnimCmd sSpriteAnim_BoxTitleFrame_0[] = {
     ANIMCMD_FRAME(0, 0, FALSE, FALSE),
     ANIMCMD_END
 };
 
-static const union AnimCmd sSpriteAnim_BoxTitleFrameMiddle[] = {
+static const union AnimCmd sSpriteAnim_BoxTitleFrame_1[] = {
     ANIMCMD_FRAME(4, 0, FALSE, FALSE),
     ANIMCMD_END
 };
 
-static const union AnimCmd sSpriteAnim_BoxTitleFrameRight[] = {
+static const union AnimCmd sSpriteAnim_BoxTitleFrame_2[] = {
     ANIMCMD_FRAME(0, 0, TRUE, FALSE),
     ANIMCMD_END
 };
 
 static const union AnimCmd *const sSpriteAnimTable_BoxTitleFrame[] = {
-    sSpriteAnim_BoxTitleFrameLeft,
-    sSpriteAnim_BoxTitleFrameMiddle,
-    sSpriteAnim_BoxTitleFrameRight,
+    sSpriteAnim_BoxTitleFrame_0,
+    sSpriteAnim_BoxTitleFrame_1,
+    sSpriteAnim_BoxTitleFrame_2,
 };
+
+static const u8 sBoxTitleFrameAnims[7] = {0, 1, 1, 1, 1, 1, 2};
 
 static const struct CompressedSpriteSheet sSpriteSheet_BoxTitleFrame =
 {
@@ -667,19 +670,19 @@ static const struct OamData sOamData_BoxTitleArrow =
     .affineParam = 0,
 };
 
-static const union AnimCmd sSpriteAnim_BoxTitleArrowLeft[] = {
+static const union AnimCmd sSpriteAnim_BoxTitleArrow_Left[] = {
     ANIMCMD_FRAME(0, 0, FALSE, FALSE),
     ANIMCMD_END
 };
 
-static const union AnimCmd sSpriteAnim_BoxTitleArrowRight[] = {
+static const union AnimCmd sSpriteAnim_BoxTitleArrow_Right[] = {
     ANIMCMD_FRAME(0, 0, TRUE, FALSE),
     ANIMCMD_END
 };
 
 static const union AnimCmd *const sSpriteAnimTable_BoxTitleArrow[] = {
-    sSpriteAnim_BoxTitleArrowLeft,
-    sSpriteAnim_BoxTitleArrowRight,
+    sSpriteAnim_BoxTitleArrow_Left,
+    sSpriteAnim_BoxTitleArrow_Right,
 };
 
 static const struct CompressedSpriteSheet sSpriteSheet_BoxTitleArrow =
@@ -1048,6 +1051,190 @@ static const struct SpriteTemplate sSpriteTemplate_TypeIcons =
     .tileTag = GFXTAG_TYPE_ICON,
     .paletteTag = PALTAG_TYPE_ICON,
     .oam = &sOamData_TypeIcons,
+};
+
+// ============================================================================
+// Markings Menu Sprites
+// ============================================================================
+
+static const struct CompressedSpriteSheet sSpriteSheet_MarkingsMenu =
+{
+    .data = sMarkingsMenu_Gfx,
+    .size = (
+        32 * 32 * 2 + // marking menu window
+        8 * 8 * 8 +   // marking menu marks
+        16 * 16 * 3   // marking menu cursor
+    ) / 2,
+    .tag = GFXTAG_MARKING_MENU,
+};
+
+static const struct OamData sOamData_MarkingsMenu_Window =
+{
+    .y = 0,
+    .affineMode = ST_OAM_AFFINE_OFF,
+    .objMode = ST_OAM_OBJ_NORMAL,
+    .mosaic = FALSE,
+    .bpp = ST_OAM_4BPP,
+    .shape = SPRITE_SHAPE(32x32),
+    .x = 0,
+    .matrixNum = 0,
+    .size = SPRITE_SIZE(32x32),
+    .tileNum = 0,
+    .priority = 0,
+    .paletteNum = 0,
+    .affineParam = 0,
+};
+
+static const union AnimCmd sAnim_MarkingsMenu_Window_0[] = {
+    ANIMCMD_FRAME(0, 0, FALSE, FALSE),
+    ANIMCMD_END
+};
+
+static const union AnimCmd sAnim_MarkingsMenu_Window_1[] = {
+    ANIMCMD_FRAME(16, 0, FALSE, FALSE),
+    ANIMCMD_END
+};
+
+static const union AnimCmd sAnim_MarkingsMenu_Window_2[] = {
+    ANIMCMD_FRAME(0, 0, TRUE, FALSE),
+    ANIMCMD_END
+};
+
+static const union AnimCmd *const sAnims_MarkingsMenu_Window[] = {
+    sAnim_MarkingsMenu_Window_0,
+    sAnim_MarkingsMenu_Window_1,
+    sAnim_MarkingsMenu_Window_2,
+};
+
+static const u8 sMarkingsMenu_WindowAnims[3] = {0, 1, 2};
+
+static const struct SpriteTemplate sSpriteTemplate_MarkingsMenu_Window =
+{
+    .tileTag = GFXTAG_MARKING_MENU,
+    .paletteTag = PALTAG_MISC_3,
+    .oam = &sOamData_MarkingsMenu_Window,
+    .anims = sAnims_MarkingsMenu_Window,
+};
+
+// Markings (4 types x 2 states = 8 sprites, all 8x8)
+static const struct OamData sOamData_MarkingsMenu_Marks =
+{
+    .y = 0,
+    .affineMode = ST_OAM_AFFINE_OFF,
+    .objMode = ST_OAM_OBJ_NORMAL,
+    .mosaic = FALSE,
+    .bpp = ST_OAM_4BPP,
+    .shape = SPRITE_SHAPE(8x8),
+    .x = 0,
+    .matrixNum = 0,
+    .size = SPRITE_SIZE(8x8),
+    .tileNum = 0,
+    .priority = 0,
+    .paletteNum = 0,
+    .affineParam = 0,
+};
+
+static const union AnimCmd sAnim_MarkingsMenu_CircleOff[] = {
+    ANIMCMD_FRAME(32, 0, FALSE, FALSE),
+    ANIMCMD_END
+};
+
+static const union AnimCmd sAnim_MarkingsMenu_CircleOn[] = {
+    ANIMCMD_FRAME(33, 0, FALSE, FALSE),
+    ANIMCMD_END
+};
+
+static const union AnimCmd sAnim_MarkingsMenu_SquareOff[] = {
+    ANIMCMD_FRAME(34, 0, FALSE, FALSE),
+    ANIMCMD_END
+};
+
+static const union AnimCmd sAnim_MarkingsMenu_SquareOn[] = {
+    ANIMCMD_FRAME(35, 0, FALSE, FALSE),
+    ANIMCMD_END
+};
+
+static const union AnimCmd sAnim_MarkingsMenu_TriangleOff[] = {
+    ANIMCMD_FRAME(36, 0, FALSE, FALSE),
+    ANIMCMD_END
+};
+
+static const union AnimCmd sAnim_MarkingsMenu_TriangleOn[] = {
+    ANIMCMD_FRAME(37, 0, FALSE, FALSE),
+    ANIMCMD_END
+};
+
+static const union AnimCmd sAnim_MarkingsMenu_HeartOff[] = {
+    ANIMCMD_FRAME(38, 0, FALSE, FALSE),
+    ANIMCMD_END
+};
+
+static const union AnimCmd sAnim_MarkingsMenu_HeartOn[] = {
+    ANIMCMD_FRAME(39, 0, FALSE, FALSE),
+    ANIMCMD_END
+};
+
+static const union AnimCmd *const sAnims_MarkingsMenu_Marks[] = {
+    sAnim_MarkingsMenu_CircleOff,
+    sAnim_MarkingsMenu_CircleOn,
+    sAnim_MarkingsMenu_SquareOff,
+    sAnim_MarkingsMenu_SquareOn,
+    sAnim_MarkingsMenu_TriangleOff,
+    sAnim_MarkingsMenu_TriangleOn,
+    sAnim_MarkingsMenu_HeartOff,
+    sAnim_MarkingsMenu_HeartOn,
+};
+
+static const struct SpriteTemplate sSpriteTemplate_MarkingsMenu_Marks =
+{
+    .tileTag = GFXTAG_MARKING_MENU,
+    .paletteTag = PALTAG_MISC_3,
+    .oam = &sOamData_MarkingsMenu_Marks,
+    .anims = sAnims_MarkingsMenu_Marks,
+};
+
+// Marking menu cursor (16x16, 3 frames)
+static const struct OamData sOamData_MarkingsMenu_Cursor =
+{
+    .y = 0,
+    .affineMode = ST_OAM_AFFINE_OFF,
+    .objMode = ST_OAM_OBJ_NORMAL,
+    .mosaic = FALSE,
+    .bpp = ST_OAM_4BPP,
+    .shape = SPRITE_SHAPE(16x16),
+    .x = 0,
+    .matrixNum = 0,
+    .size = SPRITE_SIZE(16x16),
+    .tileNum = 0,
+    .priority = 0,
+    .paletteNum = 0,
+    .affineParam = 0,
+};
+
+static const union AnimCmd sAnim_MarkingsMenu_Cursor_Bouncing[] = {
+    ANIMCMD_FRAME(40, 8, FALSE, FALSE),
+    ANIMCMD_FRAME(44, 8, FALSE, FALSE),
+    ANIMCMD_FRAME(48, 8, FALSE, FALSE),
+    ANIMCMD_FRAME(44, 8, FALSE, FALSE),
+    ANIMCMD_JUMP(0)
+};
+
+static const union AnimCmd sAnim_MarkingsMenu_Cursor_Main[] = {
+    ANIMCMD_FRAME(44, 0, FALSE, FALSE),
+    ANIMCMD_END
+};
+
+static const union AnimCmd *const sAnims_MarkingsMenu_Cursor[] = {
+    sAnim_MarkingsMenu_Cursor_Bouncing,
+    sAnim_MarkingsMenu_Cursor_Main,
+};
+
+static const struct SpriteTemplate sSpriteTemplate_MarkingsMenu_Cursor =
+{
+    .tileTag = GFXTAG_MARKING_MENU,
+    .paletteTag = PALTAG_MISC_3,
+    .oam = &sOamData_MarkingsMenu_Cursor,
+    .anims = sAnims_MarkingsMenu_Cursor,
 };
 
 // ============================================================================
