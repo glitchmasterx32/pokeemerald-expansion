@@ -4980,7 +4980,9 @@ static void PrintStatLabels(void)
     {
         const u8 *color;
 
-        if (sStatLabels[i].statIndex == natureUpStat)
+        if (natureUpStat == natureDownStat)
+            color = sTextNatureNeutral;
+        else if (sStatLabels[i].statIndex == natureUpStat)
             color = sTextNatureUp;
         else if (sStatLabels[i].statIndex == natureDownStat)
             color = sTextNatureDown;
