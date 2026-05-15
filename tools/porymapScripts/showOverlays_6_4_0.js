@@ -166,7 +166,56 @@ export function onBlockChanged(x, y, prevBlock, newBlock) {
 }
 
 
+function shiftOverlayTiles(dx, dy) {
+    if (!currentMapPath) return;
+
+    let resp = utility.readTextFile(currentMapPath);
+    if (resp.error) return;
+
+    let mapJson;
+    try {
+        mapJson = JSON.parse(resp.content);
+    } catch (e) {
+        return;
+    }
+
+    if (!mapJson.overlay || !Array.isArray(mapJson.overlay.tiles)) {
+        return;
+    }
+
+    for (const tile of mapJson.overlay.tiles) {
+        tile.x += dx;
+        tile.y += dy;
+    }
+
+    utility.writeTextFile(currentMapPath,JSON.stringify(mapJson, null, 2));
+
+    reloadLightingOverlay();
+}
+
+export function shiftOverlayUp() {
+    shiftOverlayTiles(0, -1);
+}
+
+export function shiftOverlayDown() {
+    shiftOverlayTiles(0, 1);
+}
+
+export function shiftOverlayLeft() {
+    shiftOverlayTiles(-1, 0);
+}
+
+export function shiftOverlayRight() {
+    shiftOverlayTiles(1, 0);
+}
+
+
 export function onProjectOpened(projectPath) {
     utility.registerAction("toggleLightingOverlay", "Toggle Lighting", "Shift+O");
     utility.registerToggleAction("toggleLightingPaintMode", "Toggle Lighting Paint Mode", "Shift+L", false);
+
+    utility.registerAction("shiftOverlayUp","Shift Overlay Up","Shift+8");
+    utility.registerAction("shiftOverlayDown","Shift Overlay Down","Shift+2");
+    utility.registerAction("shiftOverlayLeft","Shift Overlay Left","Shift+4");
+    utility.registerAction("shiftOverlayRight","Shift Overlay Right","Shift+6");
 }
