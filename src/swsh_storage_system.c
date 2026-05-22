@@ -340,7 +340,6 @@ enum {
 
 // Window IDs for sWindowTemplates
 enum {
-    // WIN_DISPLAY_INFO,
     WIN_MESSAGE,
     WIN_ITEM_DESC,
     WIN_MON_INFO_NICKNAME_LEFT,
@@ -547,7 +546,7 @@ struct PokemonStorageSystemData
     u16 infoTilemapBuffer[0x800];
     u16 bg0_Y;
     bool8 showMonInfo;
-    bool8 inMenuInteraction; // flag to hide mon info panel when interacting with other menus
+    bool8 inMenuInteraction;
     u8 monInfoTilemapId;
     u8 displayMonInfoLoadState;
     u8 graphicsLoadState;
@@ -1154,7 +1153,7 @@ static s16 UNUSED StorageSystemGetNextMonIndex(struct BoxPokemon *box, s8 startI
 
 static void LoadChooseBoxMenuGfx(struct ChooseBoxMenu *menu, u16 tileTag, u16 palTag, bool32 loadPal)
 {
-    LoadCompressedSpriteSheet(&sSpriteSheet_BoxSelection);
+    LoadCompressedSpriteSheet(&sSpriteSheet_ChooseBoxMenu);
     sChooseBoxMenu = menu;
     menu->tileTag = tileTag;
     menu->paletteTag = palTag;
@@ -1231,7 +1230,7 @@ static void ChooseBoxMenu_CreateSprites(u8 curBox)
 
     col = curBox % 5;
     row = curBox / 5;
-    spriteId = CreateSprite(&sSpriteTemplate_BoxSelection, 88 + col * 32, 64 + row * 32, 3);
+    spriteId = CreateSprite(&sSpriteTemplate_ChooseBoxMenu, 88 + col * 32, 64 + row * 32, 3);
     if (spriteId != MAX_SPRITES)
     {
         sChooseBoxMenu->hoverSprite = &gSprites[spriteId];
@@ -1435,7 +1434,7 @@ static void ChooseBoxMenu_PrintInfo(void)
     x = 90 + col * 32;
     if (numInBox < 10)
         x -= 3;
-    spriteId = CreateSprite(&sSpriteTemplate_BoxSelection_MonCount, x, 66 + row * 32, 2);
+    spriteId = CreateSprite(&sSpriteTemplate_ChooseBoxMenu_MonCount, x, 66 + row * 32, 2);
     if (spriteId != MAX_SPRITES)
     {
         sChooseBoxMenu->monCountSprite = &gSprites[spriteId];
@@ -2652,7 +2651,6 @@ static void OpenMonMarkingsMenu_SwSh(u8 markings, s16 x, s16 y)
 
     LoadCompressedSpriteSheet(&sSpriteSheet_MarkingsMenu);
 
-    // create menu window
     for (i = 0; i < 3; i++)
     {
         spriteId = CreateSprite(&sSpriteTemplate_MarkingsMenu_Window, x + i * 32, y, 3);
@@ -2667,7 +2665,6 @@ static void OpenMonMarkingsMenu_SwSh(u8 markings, s16 x, s16 y)
         }
     }
 
-    // create marks
     for (i = 0; i < NUM_MON_MARKINGS; i++)
     {
         spriteId = CreateSprite(&sSpriteTemplate_MarkingsMenu_Marks, 108 + i * 24, 80, 2);
@@ -2682,7 +2679,6 @@ static void OpenMonMarkingsMenu_SwSh(u8 markings, s16 x, s16 y)
         }
     }
 
-    // create cursor
     spriteId = CreateSprite(&sSpriteTemplate_MarkingsMenu_Cursor, 96, 80, 1);
     if (spriteId != MAX_SPRITES)
     {
@@ -2699,7 +2695,6 @@ static bool8 HandleMonMarkingsMenuInput_SwSh(void)
 {
     u8 i;
 
-    // cursor movement
     if (JOY_NEW(DPAD_LEFT))
     {
         PlaySE(SE_SELECT);
@@ -2717,7 +2712,6 @@ static bool8 HandleMonMarkingsMenuInput_SwSh(void)
         return TRUE;
     }
 
-    // toggle marking at cursor position
     if (JOY_NEW(A_BUTTON))
     {
         PlaySE(SE_SELECT);
@@ -3550,7 +3544,6 @@ static bool8 InitPalettesAndSprites(void)
         sStorage->graphicsLoadState++;
         break;
     case 2:
-        // Load type icon palettes to obj pals 13-15
         LoadPalette(sTypeIcons_Pal, OBJ_PLTT_ID(13), 3 * PLTT_SIZE_4BPP);
         sStorage->graphicsLoadState++;
         break;
@@ -3728,11 +3721,8 @@ static void UpdateTypeIconTiles(u8 typeId, void *dest)
     RequestDma3Copy(&sTypeIcons_Gfx[offset], dest, 0x100, 0x10);
 }
 
-// Sprite callback to update tiles during VBlank (syncs with OAM palette updates)
 static void SpriteCB_TypeIcon(struct Sprite *sprite)
 {
-    // sprite->data[0] = type ID to load
-    // sprite->data[1] = sprite index (0 or 1)
     if (sprite->data[0] != 0xFF)
     {
         u8 typeId = sprite->data[0];
@@ -3854,7 +3844,6 @@ static void UpdateStatLabelsSprites(void)
         return;
     }
 
-    // UP STAT
     switch (natureUpStat)
     {
     case STAT_ATK:
@@ -3886,7 +3875,6 @@ static void UpdateStatLabelsSprites(void)
         return;
     }
 
-    // DOWN STAT
     switch (natureDownStat)
     {
     case STAT_ATK:
@@ -5688,7 +5676,6 @@ static void TriggerArrowAnimation(struct Sprite *sprite)
     }
 }
 
-// Trigger one-shot animation for the arrow in the given direction
 static void AnimateBoxScrollArrow(s8 direction)
 {
     u8 arrowIdx = (direction < 0) ? 0 : 1; // 0 = Left, 1 = Right
@@ -6342,7 +6329,6 @@ static void SetShiftedMonData(u8 boxId, u8 position)
 
     SetPlacedMonData(boxId, position);
     
-    // update sprite of transforming mon
     if (boxId == TOTAL_BOXES_COUNT)
         UpdateSpeciesSpritePSS(&gPlayerParty[position].box);
     else
@@ -6815,11 +6801,9 @@ static void SetDisplayMonData(void *pokemon, u8 mode)
             sStorage->displayMon.gender = gender;
             sStorage->displayMon.heldItem = GetMonData(mon, MON_DATA_HELD_ITEM);
 
-            // Get types
             sStorage->displayMon.types[0] = gSpeciesInfo[sStorage->displayMon.species].types[0];
             sStorage->displayMon.types[1] = gSpeciesInfo[sStorage->displayMon.species].types[1];
 
-            // Get stats
             sStorage->displayMon.maxHP = GetMonData(mon, MON_DATA_MAX_HP);
             sStorage->displayMon.atk = GetMonData(mon, MON_DATA_ATK);
             sStorage->displayMon.def = GetMonData(mon, MON_DATA_DEF);
@@ -6827,7 +6811,6 @@ static void SetDisplayMonData(void *pokemon, u8 mode)
             sStorage->displayMon.spdef = GetMonData(mon, MON_DATA_SPDEF);
             sStorage->displayMon.speed = GetMonData(mon, MON_DATA_SPEED);
 
-            // Get ability
             sStorage->displayMon.ability = GetMonAbility(mon);
         }
     }
@@ -6860,7 +6843,6 @@ static void SetDisplayMonData(void *pokemon, u8 mode)
             sStorage->displayMon.gender = gender;
             sStorage->displayMon.heldItem = GetBoxMonData(boxMon, MON_DATA_HELD_ITEM);
 
-            // Get types
             sStorage->displayMon.types[0] = gSpeciesInfo[sStorage->displayMon.species].types[0];
             sStorage->displayMon.types[1] = gSpeciesInfo[sStorage->displayMon.species].types[1];
 
@@ -6873,7 +6855,6 @@ static void SetDisplayMonData(void *pokemon, u8 mode)
             sStorage->displayMon.spdef = GetMonData(&tempMon, MON_DATA_SPDEF);
             sStorage->displayMon.speed = GetMonData(&tempMon, MON_DATA_SPEED);
 
-            // Get ability from species and ability num
             u8 abilityNum = GetBoxMonData(boxMon, MON_DATA_ABILITY_NUM);
             sStorage->displayMon.ability = GetAbilityBySpecies(sStorage->displayMon.species, abilityNum);
         }
@@ -7750,8 +7731,7 @@ static void ToggleCursorAutoAction(void)
 
     if (sCursorMode == CURSOR_MODE_MULTI_MOVE)
     {
-        // Hide mon info panel when entering multi-move mode
-        sStorage->showMonInfo = FALSE;
+        sStorage->inMenuInteraction = TRUE;
         UpdateMonInfoTilemap();
     }
     else if (sCursorMode == CURSOR_MODE_NORMAL || sCursorMode == CURSOR_MODE_AUTO_ACTION)
@@ -7759,6 +7739,11 @@ static void ToggleCursorAutoAction(void)
         if (sStorage->inBoxMovingMode != MOVE_MODE_NORMAL)
         {
             sStorage->inBoxMovingMode = MOVE_MODE_NORMAL;
+            UpdateMonInfoTilemap();
+        }
+        if (sStorage->inMenuInteraction)
+        {
+            sStorage->inMenuInteraction = FALSE;
             UpdateMonInfoTilemap();
         }
     }
