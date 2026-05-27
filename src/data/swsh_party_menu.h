@@ -12,10 +12,10 @@ enum {
 };
 
 static const u8 sButtons_Gfx[][4 * TILE_SIZE_4BPP] = {
-    [BUTTON_START]  = INCBIN_U8("graphics/party_menu/swsh/start_button.4bpp"),
-    [BUTTON_SELECT] = INCBIN_U8("graphics/party_menu/swsh/select_button.4bpp"),
-    [BUTTON_L]      = INCBIN_U8("graphics/party_menu/swsh/l_button.4bpp"),
-    [BUTTON_R]      = INCBIN_U8("graphics/party_menu/swsh/r_button.4bpp"),
+    [BUTTON_START]  = INCBIN_U8("graphics/party_menu/swsh/button_start.4bpp"),
+    [BUTTON_SELECT] = INCBIN_U8("graphics/party_menu/swsh/button_select.4bpp"),
+    [BUTTON_L]      = INCBIN_U8("graphics/party_menu/swsh/button_l.4bpp"),
+    [BUTTON_R]      = INCBIN_U8("graphics/party_menu/swsh/button_r.4bpp"),
 };
 
 static const struct OamData sOamData_Button = {
@@ -1253,26 +1253,33 @@ static const struct SpriteTemplate sSpriteTemplate_HeldItem =
 
 static const struct OamData sOamData_HoverCursor =
 {
-    .y = 0,
     .affineMode = ST_OAM_AFFINE_OFF,
     .objMode = ST_OAM_OBJ_NORMAL,
-    .mosaic = FALSE,
     .bpp = ST_OAM_4BPP,
     .shape = SPRITE_SHAPE(16x16),
-    .x = 0,
-    .matrixNum = 0,
     .size = SPRITE_SIZE(16x16),
-    .tileNum = 0,
     .priority = 1,
-    .paletteNum = 0,
-    .affineParam = 0,
 };
 
 static const struct CompressedSpriteSheet sSpriteSheet_HoverCursor =
 {
     .data = sHoverCursorGfx,
-    .size = (16 * 16) / 2,
+    .size = (16 * 16 * 3) / 2,
     .tag = TAG_HOVER_CURSOR
+};
+
+static const union AnimCmd sAnim_HoverCursor[] =
+{
+    ANIMCMD_FRAME(0, 8),
+    ANIMCMD_FRAME(4, 8),
+    ANIMCMD_FRAME(8, 8),
+    ANIMCMD_FRAME(4, 8),
+    ANIMCMD_JUMP(0)
+};
+
+static const union AnimCmd *const sAnims_HoverCursor[] =
+{
+    sAnim_HoverCursor,
 };
 
 static const struct SpriteTemplate sSpriteTemplate_HoverCursor =
@@ -1280,6 +1287,7 @@ static const struct SpriteTemplate sSpriteTemplate_HoverCursor =
     .tileTag = TAG_HOVER_CURSOR,
     .paletteTag = TAG_HELD_ITEM,
     .oam = &sOamData_HoverCursor,
+    .anims = sAnims_HoverCursor,
 };
 
 static const struct OamData sOamData_SelectFrame =

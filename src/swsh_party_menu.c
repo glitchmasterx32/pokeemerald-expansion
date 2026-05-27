@@ -1226,18 +1226,14 @@ static bool8 DecompressGraphics(void)
         sPartyMenuInternal->switchCounter++;
         break;
     case 18:
-        LoadSpritePalette(&sSpritePal_MessageWindow);
-        sPartyMenuInternal->switchCounter++;
-        break;
-    case 19:
         LoadCompressedSpriteSheet(&sSpriteSheet_MultiuseWindow);
         sPartyMenuInternal->switchCounter++;
         break;
-    case 20:
+    case 19:
         LoadSpritePalette(&sSpritePal_MultiuseWindow);
         sPartyMenuInternal->switchCounter++;
         break;
-    case 21:
+    case 20:
         if (gPartyMenu.menuType == PARTY_MENU_TYPE_IN_BATTLE)
             LoadCompressedSpriteSheet(&sSpriteSheet_MoveTypes);
         sPartyMenuInternal->switchCounter = 0;
