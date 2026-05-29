@@ -586,7 +586,7 @@ static void Task_HideFollowerNPCForTeleport(u8);
 static void FieldCallback_RockClimb(void);
 #if SWSH_PARTY_MENU_PC_ACCESS
 static void SavePartyMenuStateForPC(void);
-static void CB2_ReopenPartyMenuFromPC(void);
+void CB2_ReopenPartyMenuFromPC(void);
 #endif
 // Multiuse item code from Kasen
 static void DisplayGiveHowManyMessage(void);
@@ -1800,7 +1800,7 @@ static void SavePartyMenuStateForPC(void)
     sSavedPartyExitCallback = gPartyMenu.exitCallback;
 }
 
-static void CB2_ReopenPartyMenuFromPC(void)
+void CB2_ReopenPartyMenuFromPC(void)
 {
     if (sSavedPartyTask == NULL)
         sSavedPartyTask = Task_HandleChooseMonInput;
