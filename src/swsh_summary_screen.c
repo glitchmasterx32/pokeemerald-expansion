@@ -284,7 +284,6 @@ static EWRAM_DATA struct PokemonSummaryScreenData
 
 static EWRAM_DATA u8 sMoveSlotToReplace = 0;
 ALIGNED(4) static EWRAM_DATA u8 sAnimDelayTaskId = 0;
-ALIGNED(4) static EWRAM_DATA u8 sShadowAnimDelayTaskId = 0;
 static EWRAM_DATA u8 sStringVar5[8] = {0};
 
 // forward declarations
@@ -2144,7 +2143,7 @@ void ShowPokemonSummaryScreen_SwSh(u8 mode, void *mons, u8 monIndex, u8 maxMonIn
         sMonSummaryScreen->currPageIndex = sMonSummaryScreen->minPageIndex;
 
     SummaryScreen_SetAnimDelayTaskId_SwSh(TASK_NONE);
-    SummaryScreen_SetShadowAnimDelayTaskId(TASK_NONE);
+    StopShadowAnimDelayTask();
 
     if (gMonSpritesGfxPtr == NULL)
         CreateMonSpritesGfxManager(MON_SPR_GFX_MANAGER_A, MON_SPR_GFX_MODE_NORMAL);
@@ -6356,11 +6355,6 @@ void SummaryScreen_SetAnimDelayTaskId_SwSh(u8 taskId)
     sAnimDelayTaskId = taskId;
 }
 
-void SummaryScreen_SetShadowAnimDelayTaskId(u8 taskId)
-{
-    sShadowAnimDelayTaskId = taskId;
-}
-
 static void SummaryScreen_DestroyAnimDelayTask(void)
 {
     if (sAnimDelayTaskId != TASK_NONE)
@@ -6368,11 +6362,7 @@ static void SummaryScreen_DestroyAnimDelayTask(void)
         DestroyTask(sAnimDelayTaskId);
         sAnimDelayTaskId = TASK_NONE;
     }
-    if (sShadowAnimDelayTaskId != TASK_NONE)
-    {
-        DestroyTask(sShadowAnimDelayTaskId);
-        sShadowAnimDelayTaskId = TASK_NONE;
-    }
+    StopShadowAnimDelayTask();
 }
 
 static void StopPokemonAnimations(void)  // A subtle effect, this function stops Pokémon animations when leaving the PSS

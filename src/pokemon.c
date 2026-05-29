@@ -6172,18 +6172,17 @@ static void Task_AnimateAfterDelay(u8 taskId)
 
 #define tIsShadow data[4]
 
+static EWRAM_DATA u8 sShadowAnimDelayTaskId = 0;
+
 static void Task_PokemonSummaryAnimateAfterDelay(u8 taskId)
 {
     if (--gTasks[taskId].sAnimDelay == 0)
     {
         StartMonSummaryAnimation(READ_PTR_FROM_TASK(taskId, 0), gTasks[taskId].sAnimId);
-        #if SWSH_SUMMARY_SCREEN == TRUE
         if (gTasks[taskId].tIsShadow)
-            SummaryScreen_SetShadowAnimDelayTaskId(TASK_NONE); // needed to track anim delay task for mon shadow in SwSh summary screen
+            sShadowAnimDelayTaskId = TASK_NONE;
         else
-        #endif
             SummaryScreen_SetAnimDelayTaskId(TASK_NONE);
-
         DestroyTask(taskId);
     }
 }
@@ -6254,13 +6253,11 @@ void PokemonSummaryDoMonAnimation(struct Sprite *sprite, u16 species, bool8 oneF
         STORE_PTR_IN_TASK(sprite, taskId, 0);
         gTasks[taskId].sAnimId = gSpeciesInfo[species].frontAnimId;
         gTasks[taskId].sAnimDelay = gSpeciesInfo[species].frontAnimDelay;
-        gTasks[taskId].tIsShadow = isShadow;  // needed to track anim delay task for mon shadow in BW summary screen
+        gTasks[taskId].tIsShadow = isShadow;
 
-        #if SWSH_SUMMARY_SCREEN == TRUE
         if (isShadow)
-            SummaryScreen_SetShadowAnimDelayTaskId(taskId);
+            sShadowAnimDelayTaskId = taskId;
         else
-        #endif
             SummaryScreen_SetAnimDelayTaskId(taskId);
 
         SetSpriteCB_MonAnimDummy(sprite);
@@ -6274,9 +6271,18 @@ void PokemonSummaryDoMonAnimation(struct Sprite *sprite, u16 species, bool8 oneF
 
 void StopPokemonAnimationDelayTask(void)
 {
-    u8 delayTaskId = FindTaskIdByFunc(Task_PokemonSummaryAnimateAfterDelay);
-    if (delayTaskId != TASK_NONE)
+    u8 delayTaskId;
+    while ((delayTaskId = FindTaskIdByFunc(Task_PokemonSummaryAnimateAfterDelay)) != TASK_NONE)
         DestroyTask(delayTaskId);
+}
+
+void StopShadowAnimDelayTask(void)
+{
+    if (sShadowAnimDelayTaskId != TASK_NONE)
+    {
+        DestroyTask(sShadowAnimDelayTaskId);
+        sShadowAnimDelayTaskId = TASK_NONE;
+    }
 }
 
 void BattleAnimateBackSprite(struct Sprite *sprite, u16 species)
