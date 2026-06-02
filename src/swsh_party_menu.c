@@ -379,7 +379,7 @@ static u8 GetPartyIdFromBattleSlot(u8);
 static void BlitBitmapToPartyMoveWindow_SwSh(u8, u8, u8, u8, u8, bool8);
 static void UpdatePartyMoveWindows(u8);
 static void DestroyMoveTypeSprites(void);
-static void DisplayPartyPokemonMoves(u8, struct Pokemon *, int);
+static void DisplayPartyPokemonMoves(u8, int, enum Move, u8, u8);
 static void DisplayPartyPokemonAbility(u8, u8);
 static u8 *GetPartyMenuBgTile(u16);
 static void Task_ClosePartyMenuAndSetCB2(u8);
@@ -1497,10 +1497,19 @@ static void DisplayPartyPokemonDescriptionData(u8 slot, u8 stringID)
 static void UpdatePartyMoveWindows(u8 slot)
 {
     int m;
-    const u8 *tm;
 
     if (gPartyMenu.menuType != PARTY_MENU_TYPE_IN_BATTLE)
         return;
+
+    struct Pokemon *mon = GetPartyMonFromPartyMenuId(slot);
+    enum Move moves[MAX_MON_MOVES];
+    u8 pps[MAX_MON_MOVES];
+    u8 ppBonuses = GetMonData(mon, MON_DATA_PP_BONUSES);
+    for (m = 0; m < MAX_MON_MOVES; m++)
+    {
+        moves[m] = GetMonData(mon, MON_DATA_MOVE1 + m);
+        pps[m]   = GetMonData(mon, MON_DATA_PP1 + m);
+    }
 
     DestroyMoveTypeSprites();
     for (m = 0; m < MAX_MON_MOVES; ++m)
@@ -1509,16 +1518,10 @@ static void UpdatePartyMoveWindows(u8 slot)
             continue;
 
         FillWindowPixelBuffer(sMoveSlots[m].windowId, PIXEL_FILL(0));
-        {
-            struct Pokemon *mon = GetPartyMonFromPartyMenuId(slot);
-            enum Move move = GetMonData(mon, MON_DATA_MOVE1 + m);
-            tm = (move != MOVE_NONE) ? sMoveTilemap_Main_SwSh : sMoveTilemap_Empty_SwSh;
-            BlitBitmapToPartyWindow(sMoveSlots[m].windowId, tm, 14, 0, 0, 14, 2);
-            if (move != MOVE_NONE)
-            {
-                DisplayPartyPokemonMoves(sMoveSlots[m].windowId, mon, m);
-            }
-        }
+        const u8 *tm = (moves[m] != MOVE_NONE) ? sMoveTilemap_Main_SwSh : sMoveTilemap_Empty_SwSh;
+        BlitBitmapToPartyWindow(sMoveSlots[m].windowId, tm, 14, 0, 0, 14, 2);
+        if (moves[m] != MOVE_NONE)
+            DisplayPartyPokemonMoves(sMoveSlots[m].windowId, m, moves[m], pps[m], ppBonuses);
         CopyWindowToVram(sMoveSlots[m].windowId, COPYWIN_GFX);
     }
     if (sAbilityWindowId != WINDOW_NONE)
@@ -3287,34 +3290,24 @@ static void DisplayPartyPokemonBarDetailToFit(u8 windowId, const u8 *str, u8 col
     AddTextPrinterParameterized3(windowId, GetFontIdToFit(str, FONT_SMALL, 0, width), align[0], align[1], sFontColorTable[color], 0, str);
 }
 
-static u8 GetPPFontColorIndexForMove(struct Pokemon *mon, enum Move move, int m)
+static u8 GetPPFontColorIndexForMove(enum Move move, u8 currentPP, u8 ppBonuses, int m)
 {
-    u8 currentPP = GetMonData(mon, MON_DATA_PP1 + m);
-    u8 ppBonuses = GetMonData(mon, MON_DATA_PP_BONUSES);
     u8 maxPP = CalculatePPWithBonus(move, ppBonuses, m);
     u8 ppState = GetCurrentPpToMaxPpState(currentPP, maxPP);
 
     return 7 + ppState;
 }
 
-static void PrintMovePPToWindow(u8 windowId, u8 fontId, struct Pokemon *mon, int m, int xBase, int y, int areaWidth)
+static void PrintMovePPToWindow(u8 windowId, u8 fontId, enum Move move, u8 pp, u8 ppBonuses, int m, int xBase, int y, int areaWidth)
 {
-    enum Move move = GetMonData(mon, MON_DATA_MOVE1 + m);
-    u8 bufDigits = 3;
-
-    ConvertIntToDecimalStringN(gStringVar1, GetMonData(mon, MON_DATA_PP1 + m), STR_CONV_MODE_RIGHT_ALIGN, bufDigits);
+    ConvertIntToDecimalStringN(gStringVar1, pp, STR_CONV_MODE_RIGHT_ALIGN, 3);
     int ppX = xBase + GetStringRightAlignXOffset(fontId, gStringVar1, areaWidth);
-    AddTextPrinterParameterized3(windowId, fontId, ppX, y, sFontColorTable[GetPPFontColorIndexForMove(mon, move, m)], 0, gStringVar1);
+    AddTextPrinterParameterized3(windowId, fontId, ppX, y, sFontColorTable[GetPPFontColorIndexForMove(move, pp, ppBonuses, m)], 0, gStringVar1);
 }
 
-static void DisplayPartyPokemonMoves(u8 windowId, struct Pokemon *mon, int m)
+static void DisplayPartyPokemonMoves(u8 windowId, int m, enum Move move, u8 pp, u8 ppBonuses)
 {
-    enum Move move = GetMonData(mon, MON_DATA_MOVE1 + m);
     const struct PartyMenuMoveBoxInfoRects *info = &sPartyMoveBoxInfoRects[0];
-
-    if (move == MOVE_NONE)
-        return;
-
     const u8 *name = GetMoveName(move);
     u8 type = gMovesInfo[move].type;
     struct SpriteTemplate template = sSpriteTemplate_MoveTypes;
@@ -3322,12 +3315,10 @@ static void DisplayPartyPokemonMoves(u8 windowId, struct Pokemon *mon, int m)
 
     sMoveSlots[m].typeSpriteId = CreateSprite(&template, 204, 24 + 16 * m, 1);
     if (sMoveSlots[m].typeSpriteId != MAX_SPRITES)
-    {
         StartSpriteAnim(&gSprites[sMoveSlots[m].typeSpriteId], type);
-    }
     AddTextPrinterParameterized3(windowId, GetFontIdToFit(name, FONT_SMALL, 0, info->dimensions[2]),
                                  info->dimensions[0], info->dimensions[1], sFontColorTable[0], 0, name);
-    PrintMovePPToWindow(windowId, FONT_SMALL, mon, m, info->dimensions[4], info->dimensions[5], info->dimensions[6]);
+    PrintMovePPToWindow(windowId, FONT_SMALL, move, pp, ppBonuses, m, info->dimensions[4], info->dimensions[5], info->dimensions[6]);
 }
 
 static void DisplayPartyPokemonNickname(struct Pokemon *mon, struct PartyMenuBox *menuBox, u8 c)
@@ -5766,7 +5757,7 @@ static void InitPartyMenuCursorMove(u8 spriteId, s16 targetX, s16 targetY)
         ReleaseComfyAnim(sPartyMenuInternal->comfyAnimY);
 
     InitComfyAnimConfig_Easing(&config);
-    config.durationFrames = 20;
+    config.durationFrames = 8;
     config.easingFunc = ComfyAnimEasing_EaseOutCubic;
 
     // X
