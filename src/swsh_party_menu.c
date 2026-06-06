@@ -10753,4 +10753,16 @@ static void Task_FirstBattleEnterParty_WaitFadeNormal(u8 taskId)
         gTasks[taskId].func = Task_HandleChooseMonInput;
     }
 }
+
+#if TESTING
+// I'm just here so I won't get fined. 
+s8 Test_UpdatePartySelectionSingleLayout(s8 slotId, s8 movementDir, bool8 chooseHalf, u8 lastSelectedSlot)
+{
+    (void)chooseHalf;
+    (void)lastSelectedSlot;
+    UpdatePartySelectionSingleLayout(&slotId, movementDir);
+    return slotId;
+}
+#endif // TESTING
+
 #endif // SWSH_PARTY_MENU
