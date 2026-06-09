@@ -2582,6 +2582,8 @@ static void Task_DepositMon(u8 taskId)
         }
         else
         {
+            sStorage->inMenuInteraction = TRUE;
+            UpdateMonInfoTilemap();
             LoadChooseBoxGfx(&sStorage->chooseBoxMenu, GFXTAG_CHOOSE_BOX_GRID_HOVER, PALTAG_MISC_3, FALSE);
             ChooseBox_CreateSprites(StorageGetCurrentBox());
             sStorage->state++;
@@ -2704,6 +2706,8 @@ static void Task_DepositMon(u8 taskId)
         if (!DoMonPlaceChange())
         {
             SetMovingMonPriority(1);
+            sStorage->inMenuInteraction = TRUE;
+            UpdateMonInfoTilemap();
             LoadChooseBoxGfx(&sStorage->chooseBoxMenu, GFXTAG_CHOOSE_BOX_GRID_HOVER, PALTAG_MISC_3, FALSE);
             ChooseBox_CreateSprites(StorageGetCurrentBox());
             sStorage->state++;
@@ -3429,6 +3433,8 @@ static void Task_JumpBox(u8 taskId)
     case 0:
         {
             u8 curBox = StorageGetCurrentBox();
+            sStorage->inMenuInteraction = TRUE;
+            UpdateMonInfoTilemap();
             LoadChooseBoxGfx(&sStorage->chooseBoxMenu, GFXTAG_CHOOSE_BOX_GRID_HOVER, PALTAG_MISC_3, FALSE);
             ChooseBox_CreateSprites(curBox);
         }
