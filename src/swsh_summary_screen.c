@@ -4819,6 +4819,7 @@ static void PrintStats(u8 mode)
 
     if (mode == SKILL_STATE_STATS)
     {
+        u16 hp2 = sMonSummaryScreen->summary.maxHP;
         u8 currentHPString[8];
         u8 maxHPString[8];
         ConvertIntToDecimalStringN(currentHPString, hp, STR_CONV_MODE_RIGHT_ALIGN, 3);
