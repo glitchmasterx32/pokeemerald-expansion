@@ -8,7 +8,7 @@
     "gMapGroup_IndoorFallarbor",
     "gMapGroup_IndoorVerdanturf",
     "gMapGroup_IndoorPacifidlog",
-    "gMapGroup_IndoorPetalburg",
+    "gMapGroup_IndoorAstralisAcademy",
     "gMapGroup_IndoorSlateport",
     "gMapGroup_IndoorMauville",
     "gMapGroup_IndoorRustboro",
@@ -77,7 +77,6 @@
     "gMapGroup_IndoorSevenIslandRoute_Frlg"
   ],
   "gMapGroup_TownsAndRoutes": [
-    "PetalburgCity",
     "SlateportCity",
     "MauvilleCity",
     "RustboroCity",
@@ -196,15 +195,7 @@
     "PacifidlogTown_House4",
     "PacifidlogTown_House5"
   ],
-  "gMapGroup_IndoorPetalburg": [
-    "PetalburgCity_WallysHouse",
-    "PetalburgCity_Gym",
-    "PetalburgCity_House1",
-    "PetalburgCity_House2",
-    "PetalburgCity_PokemonCenter_1F",
-    "PetalburgCity_PokemonCenter_2F",
-    "PetalburgCity_Mart"
-  ],
+  "gMapGroup_IndoorAstralisAcademy": [],
   "gMapGroup_IndoorSlateport": [
     "SlateportCity_SternsShipyard_1F",
     "SlateportCity_SternsShipyard_2F",
