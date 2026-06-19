@@ -70,6 +70,7 @@
 typedef u16 (*SpecialFunc)(void);
 typedef void (*NativeFunc)(struct ScriptContext *ctx);
 
+static EWRAM_DATA const u8 *gAfterWarpScript = {0};
 EWRAM_DATA const u8 *gRamScriptRetAddr = NULL;
 static EWRAM_DATA u32 sAddressOffset = 0; // For relative addressing in vgoto etc., used by saved scripts (e.g. Mystery Event)
 static EWRAM_DATA u16 sPauseCounter = 0;
@@ -962,6 +963,34 @@ bool8 ScrCmd_setmaplayoutindex(struct ScriptContext *ctx)
 
     SetCurrentMapLayout(value);
     return FALSE;
+}
+
+static void FieldCallback_SetupWarpScript(void)
+{
+    if (gAfterWarpScript == NULL)
+    {
+        gFieldCallback = NULL;
+        return;
+    }
+
+    Overworld_PlaySpecialMapMusic();
+    LockPlayerFieldControls();
+    CpuFastFill(0, gPlttBufferFaded, PLTT_SIZE);
+    ScriptContext_SetupScript(gAfterWarpScript);
+}
+
+bool8 ScrCmd_warpcontinuescript(struct ScriptContext *ctx)
+{
+    u8 mapNum = ScriptReadByte(ctx);
+    u8 mapGroup = ScriptReadByte(ctx);
+    u16 x = VarGet(ScriptReadHalfword(ctx));
+    u16 y = VarGet(ScriptReadHalfword(ctx));
+    gAfterWarpScript = (const u8 *) ScriptReadWord(ctx);
+    gFieldCallback = FieldCallback_SetupWarpScript;
+    SetWarpDestination(mapGroup, mapNum, WARP_ID_NONE, x, y);
+    WarpIntoMap();
+    SetMainCallback2(CB2_LoadMap);
+    return TRUE;
 }
 
 bool8 ScrCmd_warp(struct ScriptContext *ctx)

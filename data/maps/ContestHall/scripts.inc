@@ -235,7 +235,7 @@ ContestHall_EventScript_RandomAudiencePokefanM::
 	return
 
 ContestHall_EventScript_RandomAudienceWoman4::
-	setvar VAR_TEMP_1, OBJ_EVENT_GFX_WOMAN_4
+	setvar VAR_TEMP_1, OBJ_EVENT_GFX_MIRA
 	return
 
 ContestHall_EventScript_RandomAudienceCook::
@@ -352,7 +352,7 @@ ContestHall_EventScript_CreateMasterContestAudience::
 	createvobject OBJ_EVENT_GFX_LITTLE_GIRL, 3, 2, 8, 3, DIR_EAST
 	createvobject OBJ_EVENT_GFX_MANIAC, 4, 1, 3, 3, DIR_EAST
 	createvobject OBJ_EVENT_GFX_WOMAN_5, 6, 1, 5, 3, DIR_EAST
-	createvobject OBJ_EVENT_GFX_WOMAN_4, 7, 1, 6, 3, DIR_EAST
+	createvobject OBJ_EVENT_GFX_MIRA, 7, 1, 6, 3, DIR_EAST
 	createvobject OBJ_EVENT_GFX_GENTLEMAN, 9, 1, 8, 3, DIR_EAST
 	createvobject OBJ_EVENT_GFX_NINJA_BOY, 10, 12, 3, 3, DIR_WEST
 	createvobject OBJ_EVENT_GFX_WOMAN_2, 11, 12, 4, 3, DIR_WEST
@@ -382,7 +382,7 @@ ContestHall_EventScript_CreateWirelessContestAudience::
 	createvobject OBJ_EVENT_GFX_LITTLE_GIRL, 3, 2, 8, 3, DIR_EAST
 	createvobject OBJ_EVENT_GFX_MANIAC, 4, 1, 3, 3, DIR_EAST
 	createvobject OBJ_EVENT_GFX_WOMAN_5, 6, 1, 5, 3, DIR_EAST
-	createvobject OBJ_EVENT_GFX_WOMAN_4, 7, 1, 6, 3, DIR_EAST
+	createvobject OBJ_EVENT_GFX_MIRA, 7, 1, 6, 3, DIR_EAST
 	createvobject OBJ_EVENT_GFX_GENTLEMAN, 9, 1, 8, 3, DIR_EAST
 	createvobject OBJ_EVENT_GFX_NINJA_BOY, 10, 12, 3, 3, DIR_WEST
 	createvobject OBJ_EVENT_GFX_WOMAN_2, 11, 12, 4, 3, DIR_WEST

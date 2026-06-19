@@ -676,7 +676,7 @@ static bool32 IsRegularLandTrainer(u8 graphicsId)
         OBJ_EVENT_GFX_TWIN,
         OBJ_EVENT_GFX_WOMAN_1,
         OBJ_EVENT_GFX_WOMAN_2,
-        OBJ_EVENT_GFX_WOMAN_4,
+        OBJ_EVENT_GFX_MIRA,
         OBJ_EVENT_GFX_WOMAN_5,
         OBJ_EVENT_GFX_YOUNGSTER,
         OBJ_EVENT_GFX_TUBER_F_FRLG,

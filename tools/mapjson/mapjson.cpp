@@ -265,7 +265,20 @@ string generate_map_events_text(Json map_data) {
                      << json_to_string(obj_event, "trainer_type") << ", "
                      << json_to_string(obj_event, "trainer_sight_or_berry_tree_id") << ", "
                      << json_to_string(obj_event, "script") << ", "
-                     << json_to_string(obj_event, "flag") << "\n";
+                     << json_to_string(obj_event, "flag");
+if (obj_event.object_items().count("morning")) {
+                    text << ", morning=" << json_to_string(obj_event, "morning");
+}
+if (obj_event.object_items().count("day")) {
+                    text << ", day=" << json_to_string(obj_event, "day");
+}
+if (obj_event.object_items().count("evening")) {
+                    text << ", evening=" << json_to_string(obj_event, "evening");
+}
+if (obj_event.object_items().count("night")) {
+                    text << ", night=" << json_to_string(obj_event, "night");
+}
+text << "\n";
             } else if (type == "clone") {
                 text << "\tclone_event " << i + 1 << ", "
                      << json_to_string(obj_event, "graphics_id") << ", "

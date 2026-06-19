@@ -620,15 +620,15 @@ void SetOverworldObjectSpecies(struct ScriptContext *ctx)
         speciesId = SPECIES_LATIOS;
         break;
 
-    case OBJ_EVENT_GFX_KYOGRE_FRONT:
+    case OBJ_EVENT_GFX_PALKIA_FRONT:
     case OBJ_EVENT_GFX_KYOGRE_ASLEEP:
-    case OBJ_EVENT_GFX_KYOGRE_SIDE:
+    case OBJ_EVENT_GFX_PALKIA_SIDE:
         speciesId = SPECIES_KYOGRE;
         break;
 
-    case OBJ_EVENT_GFX_GROUDON_FRONT:
+    case OBJ_EVENT_GFX_DIALGA_FRONT:
     case OBJ_EVENT_GFX_GROUDON_ASLEEP:
-    case OBJ_EVENT_GFX_GROUDON_SIDE:
+    case OBJ_EVENT_GFX_DIALGA_SIDE:
         speciesId = SPECIES_GROUDON;
         break;
 

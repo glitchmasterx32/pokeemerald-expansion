@@ -28,7 +28,7 @@ struct LilycoveFavorLady
 
 static const u16 sLilycoveLadyGfxId[] =
 {
-    [LILYCOVE_LADY_QUIZ]    = OBJ_EVENT_GFX_WOMAN_4,
+    [LILYCOVE_LADY_QUIZ]    = OBJ_EVENT_GFX_MIRA,
     [LILYCOVE_LADY_FAVOR]   = OBJ_EVENT_GFX_WOMAN_2,
     [LILYCOVE_LADY_CONTEST] = OBJ_EVENT_GFX_GIRL_2,
 };

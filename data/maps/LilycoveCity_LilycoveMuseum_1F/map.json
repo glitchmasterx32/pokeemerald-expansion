@@ -56,7 +56,7 @@
       "flag": "0"
     },
     {
-      "graphics_id": "OBJ_EVENT_GFX_ARTIST",
+      "graphics_id": "OBJ_EVENT_GFX_VEYLOR",
       "x": 13,
       "y": 10,
       "elevation": 3,
@@ -82,7 +82,7 @@
       "flag": "0"
     },
     {
-      "graphics_id": "OBJ_EVENT_GFX_WOMAN_4",
+      "graphics_id": "OBJ_EVENT_GFX_MIRA",
       "x": 3,
       "y": 8,
       "elevation": 3,
@@ -109,7 +109,7 @@
     },
     {
       "local_id": "LOCALID_MUSEUM_1F_ARTIST_2",
-      "graphics_id": "OBJ_EVENT_GFX_ARTIST",
+      "graphics_id": "OBJ_EVENT_GFX_VEYLOR",
       "x": 19,
       "y": 3,
       "elevation": 3,

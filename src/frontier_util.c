@@ -217,7 +217,7 @@ const struct FrontierBrain gFrontierBrainInfo[NUM_FRONTIER_FACILITIES] =
     [FRONTIER_FACILITY_PIKE] =
     {
         .trainerId = TRAINER_LUCY,
-        .objEventGfx = OBJ_EVENT_GFX_LUCY,
+        .objEventGfx = OBJ_EVENT_GFX_SELENE,
         .isFemale = TRUE,
         .lostTexts = {
             COMPOUND_STRING("Urk…"), //Silver

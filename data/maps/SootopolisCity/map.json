@@ -31,7 +31,7 @@
     },
     {
       "local_id": "LOCALID_SOOTOPOLIS_WOMAN_2",
-      "graphics_id": "OBJ_EVENT_GFX_WOMAN_4",
+      "graphics_id": "OBJ_EVENT_GFX_MIRA",
       "x": 47,
       "y": 33,
       "elevation": 0,
@@ -128,7 +128,7 @@
     },
     {
       "local_id": "LOCALID_SOOTOPOLIS_GROUDON",
-      "graphics_id": "OBJ_EVENT_GFX_GROUDON_SIDE",
+      "graphics_id": "OBJ_EVENT_GFX_DIALGA_SIDE",
       "x": 28,
       "y": 44,
       "elevation": 0,
@@ -142,7 +142,7 @@
     },
     {
       "local_id": "LOCALID_SOOTOPOLIS_KYOGRE",
-      "graphics_id": "OBJ_EVENT_GFX_KYOGRE_SIDE",
+      "graphics_id": "OBJ_EVENT_GFX_PALKIA_SIDE",
       "x": 34,
       "y": 44,
       "elevation": 1,

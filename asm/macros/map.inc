@@ -24,7 +24,7 @@
 	.endm
 
 	@ Defines an object event template for map data, to be used by a normal object. Mirrors the struct layout of ObjectEventTemplate in include/global.fieldmap.h
-	.macro object_event index:req, gfx:req, x:req, y:req, elevation:req, movement_type:req, x_radius:req, y_radius:req, trainer_type:req, sight_radius_tree_etc:req, script:req, event_flag:req
+	.macro object_event index:req, gfx:req, x:req, y:req, elevation:req, movement_type:req, x_radius:req, y_radius:req, trainer_type:req, sight_radius_tree_etc:req, script:req, event_flag:req, morning=0, day=0 , evening=0, night=0
 	.byte \index
 	.2byte \gfx
 	.byte OBJ_KIND_NORMAL
@@ -36,7 +36,12 @@
 		.error "movementRangeX has a bitfield of 4 bytes, so values over 15 will overflow. Use a custom script for item balls that should give the player more than 15 items."
 	.endif
 	.byte ((\y_radius << 4) | \x_radius)
-	.space 1  @ Padding
+    .set time_visibility, 0
+	.if \morning; .set time_visibility, time_visibility | (1 << 0); .endif
+	.if \day; .set time_visibility, time_visibility | (1 << 1); .endif
+	.if \evening; .set time_visibility, time_visibility | (1 << 2); .endif
+	.if \night; .set time_visibility, time_visibility | (1 << 3); .endif
+	.byte time_visibility
 	.2byte \trainer_type
 	.2byte \sight_radius_tree_etc
 	.4byte \script
@@ -44,6 +49,7 @@
 	.space 2  @ Padding
 	inc _num_npcs
 	.endm
+
 
 	@ Defines an object event template for map data, to be used by a clone object. Mirrors the struct layout of ObjectEventTemplate in include/global.fieldmap.h
 	.macro clone_event index:req, gfx:req, x:req, y:req, target_local_id:req, target_map_id:req

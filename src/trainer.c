@@ -1,5 +1,6 @@
 #include "global.h"
 #include "constants/trainers.h"
+#include "event_data.h"
 
 static enum TrainerPicID GetEmeraldTrainerPic(enum Gender gender)
 {
@@ -17,6 +18,9 @@ static enum TrainerPicID GetKantoTrainerPic(enum Gender gender)
 
 enum TrainerPicID GetPlayerTrainerPic(enum Gender gender, enum GameVersion version)
 {
+    if (VarGet(VAR_RECYCLE_GOODS) != 0)
+        return TRAINER_PIC_RED;
+
     switch (version)
     {
         case VERSION_SAPPHIRE:
