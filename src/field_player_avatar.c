@@ -2238,7 +2238,7 @@ bool8 ObjectMovingOnRockStairs(struct ObjectEvent *objectEvent, enum Direction d
     return ObjectMovingOnRockStairsWithBehaviors(objectEvent, direction, objectEvent->currentMetatileBehavior, nextBehavior);
 }
 
-bool8 ObjectMovingOnRockStairsWithBehaviors(struct ObjectEvent *objectEvent, u8 direction,  u8 currentBehavior, u8 nextBehavior)
+bool8 ObjectMovingOnRockStairsWithBehaviors(struct ObjectEvent *objectEvent, enum Direction direction, u8 currentBehavior, u8 nextBehavior)
 {
     #if SLOW_MOVEMENT_ON_STAIRS == TRUE
 

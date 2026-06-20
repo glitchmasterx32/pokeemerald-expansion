@@ -1,4 +1,4 @@
-# Pathfinder 1.1.1
+# Pathfinder 1.1.2
 
 ## About
 
@@ -37,9 +37,6 @@ The system will display an X icon, if it's unable to find a valid path.
 If there is no path, it will most likely lag the game.
 Try to only use the macro when you are sure there is a valid path.
 
-### For expanded Metatile count users:
-Set `PATH_FINDER_MAX_ELEVATION` to `MAX_ELEVATION_LEVEL`, otherwise elevation handling won't work correctly.
-
 ## Why Weighted A*?
 
 This variant of the A* algorithm provides better performance for searching the first valid path. This done by giving more priority to nodes more close to the goal.
@@ -53,6 +50,9 @@ This variant of the A* algorithm provides better performance for searching the f
 However Weighted A* can generate less natural-looking paths than regual A*, and it can be tricked more easly by mazes, but it provides better performance in most cases, since it requires less nodes to find a valid path.
 
 ## Changelog
+
+### 1.1.2 - 2026-6-20
+- Updated to `expansion` 1.16.1.
 
 ### 1.1.1 - 2026-4-14
 

@@ -16,7 +16,6 @@
 #pragma GCC optimize("O3")
 
 #define PATH_FINDER_WEIGHT          1.5
-#define PATH_FINDER_MAX_ELEVATION   15
 #define PATH_FINDER_PRINT_TIME      FALSE
 
 struct PathNode
@@ -28,7 +27,7 @@ struct PathNode
     s16 y;
     u8 elevation;
     u8 movementAction;
-    u8 originDirection;
+    enum Direction originDirection;
     u8 currentBehavior;
 };
 
@@ -46,8 +45,8 @@ struct PathQueue
 struct PathList
 {
     struct PathNode **nodes;
-    u32 capacity; // is always a power of 2.
-    u32 mask; // is always: capacity - 1.
+    u32 capacity;  // is always a power of 2.
+    u32 mask;      // is always: capacity - 1.
     u32 size;
 };
 
@@ -68,18 +67,18 @@ struct PathFinderContext
 
 static u8 *FindPathForObjectEvent(struct PathFinderContext *ctx, u32 maxNodes);
 static void MoveObjectEventToCoords(u8 localId, s16 targetX, s16 targetY, u8 facingDirection, u32 speed, u32 maxNodes);
-static bool32 FindObjectEventApproachPosition(u8 localId, u8 direction, struct Coords16* result);
+static bool32 FindObjectEventApproachPosition(u8 localId, enum Direction direction, struct Coords16* result);
 static u8 *ReconstructPath(struct PathNode *targetNode, u8 facingDirection);
 static inline bool32 PathFinderTargetReached(struct PathFinderContext *ctx);
 static inline u32 ManhattanDistance(s16 x1, s16 y1, s16 x2, s16 y2);
-static u8 CheckForPathFinderCollision(struct PathFinderContext *ctx, s16 x, s16 y, u8 direction, u8 currentBehavior, u8 nextBehavior);
-static inline void TryCreateNeighbor(struct PathFinderContext *ctx, u8 direction);
+static u8 CheckForPathFinderCollision(struct PathFinderContext *ctx, s16 x, s16 y, enum Direction direction, u8 currentBehavior, u8 nextBehavior);
+static inline void TryCreateNeighbor(struct PathFinderContext *ctx, enum Direction direction);
 
 // PathNode utility functions
 static inline void PathNode_CreateStart(struct PathFinderContext *ctx);
-static inline void PathNode_CreateNeighbor(struct PathFinderContext *ctx, s16 x, s16 y, u8 direction, u32 costG, u8 currentBehavior, u8 movementAction);
-static inline u32 PathNode_ComputeCostH(struct PathFinderContext *ctx, s16 x, s16 y);
+static inline void PathNode_CreateNeighbor(struct PathFinderContext *ctx, s16 x, s16 y, enum Direction direction, u32 costG, u8 currentBehavior, u8 movementAction);
 static inline u8 PathNode_GetElevation(struct PathNode *node, s16 x, s16 y);
+static inline u32 PathNode_ComputeCostH(struct PathFinderContext *ctx, s16 x, s16 y);
 static inline bool32 PathNode_HasLowerCost(struct PathNode *node1, struct PathNode *node2);
 static inline bool32 PathNode_MatchesCoords(struct PathNode *node1, s16 x, s16 y, u8 elevation);
 static inline u32 PathNode_Hash(s16 x, s16 y, u8 elevation);
@@ -207,11 +206,8 @@ static const u8* sMovementsBySpeed[] =
 
 struct PathFinderContext CreatePathFinderContext(struct ObjectEvent *objectEvent, s16 targetX, s16 targetY, u8 facingDirection, u8 speed, u32 maxNodes)
 {
-    if (speed >= ARRAY_COUNT(sMovementsBySpeed))
-        speed = ARRAY_COUNT(sMovementsBySpeed) - 1;
-
-    if (facingDirection > DIR_EAST)
-        facingDirection -= DIR_EAST;
+    assertf(speed < ARRAY_COUNT(sMovementsBySpeed), "Invalid speed. Speed can be [0, %u]. Current: %u.", ARRAY_COUNT(sMovementsBySpeed) - 1, speed);
+    assertf(facingDirection < CARDINAL_DIRECTION_COUNT, "Invalid direction. It can only be a cardinal direction.");
 
     struct PathFinderContext ctx;
     ctx.start.x = objectEvent->currentCoords.x;
@@ -333,11 +329,10 @@ static void MoveObjectEventToCoords(u8 localId, s16 targetX, s16 targetY, u8 fac
 
 static u8 *FindPathForObjectEvent(struct PathFinderContext *ctx, u32 maxNodes)
 {
-    if (maxNodes == 0)
-        return NULL;
+    assertf(maxNodes != 0, "maxNodes cannot be 0");
 
-    struct PathNode *nextNode;
     PathNode_CreateStart(ctx);
+    struct PathNode *nextNode;
 
     while (PathQueue_Pop(&ctx->nodeFrontier, &nextNode))
     {
@@ -349,7 +344,7 @@ static u8 *FindPathForObjectEvent(struct PathFinderContext *ctx, u32 maxNodes)
         if (PathFinderTargetReached(ctx))
             return ReconstructPath(ctx->currentNode, ctx->facingDirection);
 
-        u8 direction = ctx->currentNode->originDirection;
+        enum Direction direction = ctx->currentNode->originDirection;
         u8 neighborCount = sNeighborCount[direction];
 
         for (u32 i = 0; i < neighborCount; i++)
@@ -359,13 +354,10 @@ static u8 *FindPathForObjectEvent(struct PathFinderContext *ctx, u32 maxNodes)
     return NULL;
 }
 
-static bool32 FindObjectEventApproachPosition(u8 localId, u8 direction, struct Coords16* result)
+static bool32 FindObjectEventApproachPosition(u8 localId, enum Direction direction, struct Coords16* result)
 {
-    if (direction == DIR_NONE)
-        return FALSE;
-
-    if (direction > DIR_EAST)
-        direction -= DIR_EAST;
+    assertf(direction == DIR_NONE, "Direction not supported.")
+    assertf(direction < CARDINAL_DIRECTION_COUNT, "Invalid direction. It can only be a cardinal direction.");
 
     struct ObjectEvent *objectEvent = &gObjectEvents[GetObjectEventIdByLocalId(localId)];
 
@@ -379,7 +371,7 @@ static bool32 FindObjectEventApproachPosition(u8 localId, u8 direction, struct C
     return TRUE;
 }
 
-static inline void TryCreateNeighbor(struct PathFinderContext *ctx, u8 direction)
+static inline void TryCreateNeighbor(struct PathFinderContext *ctx, enum Direction direction)
 {
     struct PathNode *currentNode = ctx->currentNode;
     s16 neighborX = currentNode->x + gDirectionToVectors[direction].x;
@@ -387,7 +379,7 @@ static inline void TryCreateNeighbor(struct PathFinderContext *ctx, u8 direction
     u8 nextBehavior = MapGridGetMetatileBehaviorAt(neighborX, neighborY);
     u8 currentBehavior = currentNode->currentBehavior;
 
-    u8 collision = CheckForPathFinderCollision(ctx, neighborX, neighborY, direction, currentBehavior, nextBehavior);
+    enum Collision collision = CheckForPathFinderCollision(ctx, neighborX, neighborY, direction, currentBehavior, nextBehavior);
 
     if (collision == COLLISION_NONE)
     {
@@ -466,7 +458,7 @@ static inline bool32 PathFinderTargetReached(struct PathFinderContext *ctx)
     return FALSE;
 }
 
-static u8 CheckForPathFinderCollision(struct PathFinderContext *ctx, s16 x, s16 y, u8 direction, u8 currentBehavior, u8 nextBehavior)
+static u8 CheckForPathFinderCollision(struct PathFinderContext *ctx, s16 x, s16 y, enum Direction direction, u8 currentBehavior, u8 nextBehavior)
 {
     struct ObjectEvent *objectEvent = ctx->objectEvent;
     u8 elevation = ctx->currentNode->elevation;
@@ -495,7 +487,7 @@ static inline u32 ManhattanDistance(s16 x1, s16 y1, s16 x2, s16 y2)
 // Nodes /////////////////////////
 //////////////////////////////////
 
-static inline u8 OppositeDirection(u8 direction)
+static inline u8 OppositeDirection(enum Direction direction)
 {
     switch (direction)
     {
@@ -527,12 +519,13 @@ static inline void PathNode_CreateStart(struct PathFinderContext *ctx)
     ctx->nodeCount++;
 }
 
-static inline void PathNode_CreateNeighbor(struct PathFinderContext *ctx, s16 x, s16 y, u8 direction, u32 costG, u8 currentBehavior, u8 movementAction)
+static inline void PathNode_CreateNeighbor(struct PathFinderContext *ctx, s16 x, s16 y, enum Direction direction, u32 costG, u8 currentBehavior, u8 movementAction)
 {
     if (ctx->maxNodes == ctx->nodeCount)
         return;
 
     u8 elevation = PathNode_GetElevation(ctx->currentNode, x, y);
+
     if(PathList_ContainsCoords(&ctx->exploredNodes, x, y, elevation))
         return;
 
@@ -567,8 +560,8 @@ static inline u8 PathNode_GetElevation(struct PathNode *parent, s16 x, s16 y)
 {
     u8 elevation = MapGridGetElevationAt(x, y);
 
-    if (elevation == PATH_FINDER_MAX_ELEVATION && parent != NULL)
-        elevation = parent->elevation;
+    if (elevation == ELEVATION_MULTI_LEVEL)
+        return parent->elevation;
 
     return elevation;
 }
