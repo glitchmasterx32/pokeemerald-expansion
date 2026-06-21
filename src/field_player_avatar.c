@@ -1574,6 +1574,9 @@ u16 GetRivalAvatarGraphicsIdByStateIdAndGender(u8 state, enum Gender gender)
 
 u16 GetPlayerAvatarGraphicsIdByStateIdAndGender(u8 state, enum Gender gender)
 {
+    if (gSaveBlock1Ptr->playerIsMorphed)
+        return gSaveBlock1Ptr->playerMorphGraphicsId;
+
     return sPlayerAvatarGfxIds[state][gender];
 }
 

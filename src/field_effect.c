@@ -4991,6 +4991,11 @@ static void MorphObject_Internal(u32 objectEventId, u32 graphicsId, enum MorphTy
 {
     if (type == INSTANT_MORPH)
     {
+        if (objectEventId == gPlayerAvatar.objectEventId)
+        {
+            gSaveBlock1Ptr->playerMorphGraphicsId = graphicsId;
+            gSaveBlock1Ptr->playerIsMorphed = TRUE;
+        }
         ObjectEventSetGraphicsId(&gObjectEvents[objectEventId], graphicsId);
         ObjectEventTurn(&gObjectEvents[objectEventId], gObjectEvents[objectEventId].movementDirection);
         return;

@@ -35,6 +35,7 @@ MauvilleCity_EventScript_RichBoy::
 	end
 
 MauvilleCity_EventScript_CitySign::
+    instantmorph LOCALID_PLAYER, OBJ_EVENT_GFX_NIHIL
 	msgbox MauvilleCity_Text_CitySign, MSGBOX_SIGN
 	end
 
