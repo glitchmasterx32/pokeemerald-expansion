@@ -3,12 +3,14 @@
 #include "text.h"
 #include "strings.h"
 #include "union_room_chat.h"
+#include "event_data.h"
 
 EWRAM_DATA u8 gStringVar1[0x100] = {0};
 EWRAM_DATA u8 gStringVar2[0x100] = {0};
 EWRAM_DATA u8 gStringVar3[0x100] = {0};
 EWRAM_DATA u8 gStringVar4[0x3E8] = {0};
 EWRAM_DATA static u8 sUnknownStringVar[16] = {0};
+EWRAM_DATA u8 gAlt_Name[0x100] = {0};
 
 static const u8 sDigits[] = __("0123456789ABCDEF");
 
@@ -451,6 +453,10 @@ static const u8 *ExpandPlaceholder_UnknownStringVar(void)
 
 static const u8 *ExpandPlaceholder_PlayerName(void)
 {
+    if (FlagGet(FLAG_CHANGE_NAME)){
+        UpdateAltPlayerName();
+        return gAlt_Name;
+    }
     return gSaveBlock2Ptr->playerName;
 }
 
@@ -533,6 +539,11 @@ static const u8 *ExpandPlaceholder_Region(void)
         return gText_Hoenn;
 }
 
+static const u8 *ExpandPlaceholder_Alt_Name(void)
+{
+    return gAlt_Name;
+}
+
 const u8 *GetExpandedPlaceholder(u32 id)
 {
     typedef const u8 *(*ExpandPlaceholderFunc)(void);
@@ -554,6 +565,7 @@ const u8 *GetExpandedPlaceholder(u32 id)
         [PLACEHOLDER_ID_KYOGRE]       = ExpandPlaceholder_Kyogre,
         [PLACEHOLDER_ID_GROUDON]      = ExpandPlaceholder_Groudon,
         [PLACEHOLDER_ID_REGION]       = ExpandPlaceholder_Region,
+        [PLACEHOLDER_ID_STRING_ALT_NAME]      = ExpandPlaceholder_Alt_Name,
     };
 
     if (id >= ARRAY_COUNT(funcs))
@@ -857,4 +869,26 @@ bool32 DoesStringProperlyTerminate(const u8 *str, u32 last)
     }
 
     return FALSE;
+}
+
+void UpdateAltPlayerName(void)
+{
+    switch (VarGet(VAR_CHANGE_NAME))
+    {
+    case 0: 
+        StringCopy(gAlt_Name, COMPOUND_STRING("Aurther"));
+        break;
+
+    case 1: 
+        StringCopy(gAlt_Name, COMPOUND_STRING("Kael"));
+        break;
+
+    case 2:
+        StringCopy(gAlt_Name, COMPOUND_STRING("Elysia"));
+        break;
+
+    default:
+        StringCopy(gAlt_Name, COMPOUND_STRING("Aurther"));
+        break;
+    }
 }

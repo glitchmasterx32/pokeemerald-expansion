@@ -31,6 +31,8 @@
 #include "constants/event_objects.h"
 #include "constants/rgb.h"
 
+EWRAM_DATA static u8 gPlayerNameBackup[PLAYER_NAME_LENGTH + 1];
+
 enum {
     INPUT_NONE,
     INPUT_DPAD_UP,
@@ -2648,3 +2650,31 @@ static const struct SpritePalette sSpritePalettes[] =
     {gNamingScreenMenu_Pal[4], PALTAG_OK_BUTTON},
     {}
 };
+
+void Do_Player_Name(void)
+{
+    DoNamingScreen(NAMING_SCREEN_PLAYER, gSaveBlock2Ptr->playerName, gSaveBlock2Ptr->playerGender, 0, 0, CB2_ReturnToFieldContinueScript);
+}
+
+void Backup_Player_Name(void)
+{
+    StringCopy(gPlayerNameBackup, gSaveBlock2Ptr->playerName);
+}
+
+void ForceSetPlayerName(const u8 *newName)
+{
+    StringCopyN(gSaveBlock2Ptr->playerName, newName, PLAYER_NAME_LENGTH);
+    gSaveBlock2Ptr->playerName[PLAYER_NAME_LENGTH] = EOS;
+}
+
+void ForceSetPlayerName_FromAltName(void)
+{
+    UpdateAltPlayerName();
+    ForceSetPlayerName(gAlt_Name);
+}
+
+void RestorePlayerName(void)
+{
+    StringCopy(gSaveBlock2Ptr->playerName, gPlayerNameBackup);
+    gSaveBlock2Ptr->playerName[PLAYER_NAME_LENGTH] = EOS;
+}

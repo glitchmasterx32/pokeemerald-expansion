@@ -7,6 +7,7 @@ extern u8 gStringVar1[0x100];
 extern u8 gStringVar2[0x100];
 extern u8 gStringVar3[0x100];
 extern u8 gStringVar4[0x3E8];
+extern u8 gAlt_Name[0x100];
 
 enum StringConvertMode
 {
@@ -24,6 +25,7 @@ enum TextColorType
     TEXT_COLOR_TYPE_BACKGROUND,
 };
 
+void UpdateAltPlayerName(void);
 u8 *StringCopy_Nickname(u8 *dest, const u8 *src);
 u8 *StringGet_Nickname(u8 *str);
 u8 *StringCopy_PlayerName(u8 *dest, const u8 *src);

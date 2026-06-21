@@ -2701,6 +2701,25 @@
 	cant_see_if 5
 	.endm
 
+	@ Shows the message box containing the help window and its header and description.
+	.macro showhelpwindow id:req
+	callnative ShowHelpInfoWindow, requests_effects=1
+	.2byte \id
+	.endm
+	
+	@ Destroys the help window.
+	.macro hidehelpwindow
+	callnative HideHelpInfoWindow
+	.endm
+
+	@ Creates a help window.
+	.macro helpwindow id:req
+	showhelpwindow \id
+	waitbuttonpress
+	hidehelpwindow
+	closemessage
+	.endm
+
 	.macro setmultitrainerbattle trainer_a:req, lose_text_a:req, trainer_b:req, lose_text_b:req, partnerId:req
 	callnative SetMultiTrainerBattle
 	.2byte \trainer_a
