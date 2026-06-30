@@ -368,6 +368,12 @@ const struct TrainerClass gTrainerClasses[TRAINER_CLASS_COUNT] =
     [TRAINER_CLASS_PIKE_QUEEN] = { _("PIKE QUEEN") },
     [TRAINER_CLASS_PYRAMID_KING] = { _("PYRAMID KING") },
     [TRAINER_CLASS_RS_PROTAG] = { _("{PKMN} TRAINER") },
+    [TRAINER_CLASS_EQUINO] = { _("Equino"), 10 },
+    [TRAINER_CLASS_EQUINO_ADMIN] = { _("Equino Admin"),50 },
+    [TRAINER_CLASS_EQUINO_LEADER] = { _("Equino Head"),100 },
+    [TRAINER_CLASS_SHADOW_SLAYER] = { _("Shadow"), 20 },
+    [TRAINER_CLASS_ACADEMY_HEAD] = { _("Academy Head"),100 },
+    [TRAINER_CLASS_NEXUS_ADMIN] = { _("Nexus Admin") },
 
     [TRAINER_CLASS_YOUNGSTER_FRLG] =       { _("YOUNGSTER"), 4 },
     [TRAINER_CLASS_BUG_CATCHER_FRLG] =     { _("BUG CATCHER"), 3 },

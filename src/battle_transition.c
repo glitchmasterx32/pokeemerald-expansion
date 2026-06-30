@@ -113,6 +113,7 @@ static void Task_AngledWipes(u8);
 static void Task_Mugshot(u8);
 static void Task_Aqua(u8);
 static void Task_Magma(u8);
+static void Task_Equino(u8);
 static void Task_Regice(u8);
 static void Task_Registeel(u8);
 static void Task_Regirock(u8);
@@ -286,6 +287,8 @@ static bool8 MugshotTrainerPic_Slide(struct Sprite *);
 static bool8 MugshotTrainerPic_SlideSlow(struct Sprite *);
 static bool8 MugshotTrainerPic_SlidePartner(struct Sprite *);
 static bool8 MugshotTrainerPic_SlideOffscreen(struct Sprite *);
+static bool8 Equino_Init(struct Task *);
+static bool8 Equino_SetGfx(struct Task *);
 
 static s16 sDebug_RectangularSpiralData;
 static u8 sTestingTransitionId;
@@ -304,6 +307,9 @@ static const u32 sShrinkingBoxTileset[] = INCGFX_U32("graphics/battle_transition
 static const u16 sEvilTeam_Palette[] = INCGFX_U16("graphics/battle_transitions/evil_team.pal", ".gbapal");
 static const u32 sTeamAqua_Tileset[] = INCGFX_U32("graphics/battle_transitions/team_aqua.png", ".4bpp.smol");
 static const u32 sTeamAqua_Tilemap[] = INCGFX_U32("graphics/battle_transitions/team_aqua.bin", ".smolTM");
+static const u32 sEquino_Tileset[] = INCBIN_U32("graphics/battle_transitions/equino.4bpp.smol");
+static const u32 sEquino_Tilemap[] = INCBIN_U32("graphics/battle_transitions/equino.bin.smolTM");
+static const u16 sEquino_Palette[] = INCBIN_U16("graphics/battle_transitions/equino.gbapal");
 static const u32 sTeamMagma_Tileset[] = INCGFX_U32("graphics/battle_transitions/team_magma.png", ".4bpp.smol");
 static const u32 sTeamMagma_Tilemap[] = INCGFX_U32("graphics/battle_transitions/team_magma.bin", ".smolTM");
 static const u32 sRegis_Tileset[] = INCGFX_U32("graphics/battle_transitions/regis.png", ".4bpp", "-num_tiles 53 -Wnum_tiles");
@@ -383,6 +389,7 @@ static const TaskFunc sTasks_Main[B_TRANSITION_COUNT] =
     [B_TRANSITION_FRONTIER_CIRCLES_CROSS_IN_SEQ] = Task_FrontierCirclesCrossInSeq,
     [B_TRANSITION_FRONTIER_CIRCLES_ASYMMETRIC_SPIRAL_IN_SEQ] = Task_FrontierCirclesAsymmetricSpiralInSeq,
     [B_TRANSITION_FRONTIER_CIRCLES_SYMMETRIC_SPIRAL_IN_SEQ] = Task_FrontierCirclesSymmetricSpiralInSeq,
+    [B_TRANSITION_EQUINO] = Task_Equino,
 };
 
 static const TransitionStateFunc sTaskHandlers[] =
@@ -410,6 +417,17 @@ static const TransitionStateFunc sShuffle_Funcs[] =
 {
     Shuffle_Init,
     Shuffle_End,
+};
+
+static const TransitionStateFunc sEquino_Funcs[] =
+{
+    Equino_Init,
+    Equino_SetGfx,
+    PatternWeave_Blend1,
+    PatternWeave_Blend2,
+    PatternWeave_FinishAppear,
+    FramesCountdown,
+    PatternWeave_CircularMask
 };
 
 static const TransitionStateFunc sAqua_Funcs[] =
@@ -1323,6 +1341,11 @@ static void Task_BigPokeball(u8 taskId)
     while (sBigPokeball_Funcs[gTasks[taskId].tState](&gTasks[taskId]));
 }
 
+static void Task_Equino(u8 taskId)
+{
+    while (sEquino_Funcs[gTasks[taskId].tState](&gTasks[taskId]));
+}
+
 static void Task_Aqua(u8 taskId)
 {
     while (sAqua_Funcs[gTasks[taskId].tState](&gTasks[taskId]));
@@ -1376,6 +1399,21 @@ static void InitPatternWeaveTransition(struct Task *task)
         gScanlineEffectRegBuffers[1][i] = DISPLAY_WIDTH;
 
     SetVBlankCallback(VBlankCB_PatternWeave);
+}
+
+static bool8 Equino_Init(struct Task *task)
+{
+    u16 *tilemap, *tileset;
+
+    task->tEndDelay = 60;
+    InitPatternWeaveTransition(task);
+    GetBg0TilesDst(&tilemap, &tileset);
+    CpuFill16(0, tilemap, BG_SCREEN_SIZE);
+    DecompressDataWithHeaderVram(sEquino_Tileset, tileset);
+    LoadPalette(sEquino_Palette, BG_PLTT_ID(15), sizeof(sEquino_Palette));
+
+    task->tState++;
+    return FALSE;
 }
 
 static bool8 Aqua_Init(struct Task *task)
@@ -1454,6 +1492,18 @@ static bool8 BigPokeball_SetGfx(struct Task *task)
 
     task->tState++;
     return TRUE;
+}
+
+static bool8 Equino_SetGfx(struct Task *task)
+{
+    u16 *tilemap, *tileset;
+
+    GetBg0TilesDst(&tilemap, &tileset);
+    DecompressDataWithHeaderVram(sEquino_Tilemap, tilemap);
+    SetSinWave((s16*)gScanlineEffectRegBuffers[0], 0, task->tSinIndex, 132, task->tAmplitude, DISPLAY_HEIGHT);
+
+    task->tState++;
+    return FALSE;
 }
 
 static bool8 Aqua_SetGfx(struct Task *task)

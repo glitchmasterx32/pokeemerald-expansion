@@ -879,6 +879,11 @@ enum BattleTransition GetTrainerBattleTransition(void)
         || trainerClass == TRAINER_CLASS_AQUA_LEADER
         || trainerClass == TRAINER_CLASS_AQUA_ADMIN)
         return B_TRANSITION_AQUA;
+    
+    if (trainerClass == TRAINER_CLASS_EQUINO
+        || trainerClass == TRAINER_CLASS_EQUINO_LEADER
+        || trainerClass == TRAINER_CLASS_EQUINO_ADMIN)
+        return B_TRANSITION_EQUINO;
 
     switch (GetTrainerBattleType(trainerId))
     {

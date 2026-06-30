@@ -4124,10 +4124,6 @@ static void UNUSED FadeOverlay(u8 eva, u8 evb)
 
 void SetOverlayEnabled(bool8 active)
 {
-    u8 timeOfDay = GetTimeOfDay();
-    if (timeOfDay == TIME_NIGHT || timeOfDay == TIME_EVENING)
-        return;// Do something for night time
-
     sOverlayState.active = active;
 
     if (active) 
