@@ -103,6 +103,11 @@
 // Up to 8 item slots can be visible at a time
 #define MAX_ITEMS_SHOWN 6
 
+
+#define FUSE_MON        1
+#define UNFUSE_MON      2
+#define SECOND_FUSE_MON 3
+
 enum {
     SWITCH_POCKET_NONE,
     SWITCH_POCKET_LEFT,
@@ -1743,6 +1748,24 @@ static void BagMenu_AllocObjPalettes(void)
     AllocSpritePalette(TAG_ITEM_CURSOR);        // Pal 0
     AllocSpritePalette(TAG_BAG_ITEM_ICON_0);    // Pal 1
     AllocSpritePalette(TAG_BAG_ITEM_ICON_1);    // Pal 2
+}
+
+extern u8 IsFusionMon(enum Species species)
+{
+    u16 i;
+    const struct Fusion *itemFusion = gFusionTablePointers[species];
+    if (itemFusion == NULL)
+        return FALSE;
+    for (i = 0; itemFusion[i].fusionStorageIndex != FUSION_TERMINATOR; i++)
+    {
+        if (itemFusion[i].fusingIntoMon == species)
+            return UNFUSE_MON;
+        else if (itemFusion[i].targetSpecies1 == species)
+            return FUSE_MON;
+        else if (itemFusion[i].targetSpecies2 == species)
+            return SECOND_FUSE_MON;
+    }
+    return FALSE;
 }
 
 static bool8 SetupBagMenu(void)
