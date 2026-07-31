@@ -857,7 +857,7 @@ void HandleInputChooseMove(enum BattlerId battler)
             {
                 if (B_SHOW_EFFECTIVENESS)
                     MoveSelectionDisplayMoveEffectiveness(CheckTargetTypeEffectiveness(battler), battler);
-                MoveSelectionDisplayPpNumber(battler);
+                MoveSelectionDisplayPPNumber(battler);
                 MoveSelectionDisplayMoveType(battler);
             }
             // end bwBattleUI
@@ -885,7 +885,7 @@ void HandleInputChooseMove(enum BattlerId battler)
             {
                 if (B_SHOW_EFFECTIVENESS)
                     MoveSelectionDisplayMoveEffectiveness(CheckTargetTypeEffectiveness(battler), battler);
-                MoveSelectionDisplayPpNumber(battler);
+                MoveSelectionDisplayPPNumber(battler);
                 MoveSelectionDisplayMoveType(battler);
             }
             // end bwBattleUI
@@ -912,7 +912,7 @@ void HandleInputChooseMove(enum BattlerId battler)
             {
                 if (B_SHOW_EFFECTIVENESS)
                     MoveSelectionDisplayMoveEffectiveness(CheckTargetTypeEffectiveness(battler), battler);
-                MoveSelectionDisplayPpNumber(battler);
+                MoveSelectionDisplayPPNumber(battler);
                 MoveSelectionDisplayMoveType(battler);
             }
             // end bwBattleUI
@@ -940,7 +940,7 @@ void HandleInputChooseMove(enum BattlerId battler)
             {
                 if (B_SHOW_EFFECTIVENESS)
                     MoveSelectionDisplayMoveEffectiveness(CheckTargetTypeEffectiveness(battler), battler);
-                MoveSelectionDisplayPpNumber(battler);
+                MoveSelectionDisplayPPNumber(battler);
                 MoveSelectionDisplayMoveType(battler);
             }
             // end bwBattleUI
