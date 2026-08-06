@@ -1825,3 +1825,18 @@ bool8 MetatileBehavior_IsTrainerTowerMonitor(u8 metatileBehavior)
         return FALSE;
 }
 
+bool8 MetatileBehavior_IsBlood(u8 metatileBehavior)
+{
+    if (metatileBehavior == MB_BLOOD)
+        return TRUE;
+    else
+        return FALSE;
+}
+
+bool8 MetatileBehavior_IsM_Grave(u8 metatileBehavior)
+{
+    if (metatileBehavior == MB_M_GRAVE)
+        return TRUE;
+    else
+        return FALSE;
+}

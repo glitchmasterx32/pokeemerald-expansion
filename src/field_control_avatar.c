@@ -524,6 +524,10 @@ static const u8 *GetInteractedMetatileScript(struct MapPosition *position, u8 me
         return EventScript_Questionnaire;
     if (MetatileBehavior_IsTrainerHillTimer(metatileBehavior) == TRUE)
         return EventScript_TrainerHillTimer;
+    if (MetatileBehavior_IsBlood(metatileBehavior) == TRUE)
+        return EventScript_Blood;
+    if (MetatileBehavior_IsM_Grave(metatileBehavior) == TRUE)
+        return EventScript_M_Grave;
     if (IS_FRLG)
     {
         if (MetatileBehavior_IsFood(metatileBehavior) == TRUE)

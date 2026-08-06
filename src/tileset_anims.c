@@ -1432,3 +1432,330 @@ void InitTilesetAnim_CeladonGym(void)
     sSecondaryTilesetAnimCallback = TilesetAnim_CeladonGym;
 }
 
+/*----------------------------*/
+//LP_General
+//Flower
+const u16 gTilesetAnims_LPGeneral_Flower_Frame0[] = INCBIN_U16("data/tilesets/primary/lpgeneral/anim/flower/00.4bpp");
+const u16 gTilesetAnims_LPGeneral_Flower_Frame1[] = INCBIN_U16("data/tilesets/primary/lpgeneral/anim/flower/01.4bpp");
+const u16 gTilesetAnims_LPGeneral_Flower_Frame2[] = INCBIN_U16("data/tilesets/primary/lpgeneral/anim/flower/02.4bpp");
+const u16 gTilesetAnims_LPGeneral_Flower_Frame3[] = INCBIN_U16("data/tilesets/primary/lpgeneral/anim/flower/03.4bpp");
+
+const u16 *const gTilesetAnims_LPGeneral_Flower[] = {
+    gTilesetAnims_LPGeneral_Flower_Frame0,
+    gTilesetAnims_LPGeneral_Flower_Frame1,
+    gTilesetAnims_LPGeneral_Flower_Frame2,
+    gTilesetAnims_LPGeneral_Flower_Frame3
+};
+
+static void QueueAnimTiles_LPGeneral_Flower(u16 timer)
+{
+    u16 i = timer % ARRAY_COUNT(gTilesetAnims_LPGeneral_Flower);
+    AppendTilesetAnimToBuffer(gTilesetAnims_LPGeneral_Flower[i], (u16 *)(BG_VRAM + TILE_OFFSET_4BPP(508)), 4 * TILE_SIZE_4BPP);
+}
+
+//Water
+const u16 gTilesetAnims_LPGeneral_Water_Frame0[] = INCBIN_U16("data/tilesets/primary/lpgeneral/anim/water/00.4bpp");
+const u16 gTilesetAnims_LPGeneral_Water_Frame1[] = INCBIN_U16("data/tilesets/primary/lpgeneral/anim/water/01.4bpp");
+const u16 gTilesetAnims_LPGeneral_Water_Frame2[] = INCBIN_U16("data/tilesets/primary/lpgeneral/anim/water/02.4bpp");
+const u16 gTilesetAnims_LPGeneral_Water_Frame3[] = INCBIN_U16("data/tilesets/primary/lpgeneral/anim/water/03.4bpp");
+const u16 gTilesetAnims_LPGeneral_Water_Frame4[] = INCBIN_U16("data/tilesets/primary/lpgeneral/anim/water/04.4bpp");
+const u16 gTilesetAnims_LPGeneral_Water_Frame5[] = INCBIN_U16("data/tilesets/primary/lpgeneral/anim/water/05.4bpp");
+const u16 gTilesetAnims_LPGeneral_Water_Frame6[] = INCBIN_U16("data/tilesets/primary/lpgeneral/anim/water/06.4bpp");
+const u16 gTilesetAnims_LPGeneral_Water_Frame7[] = INCBIN_U16("data/tilesets/primary/lpgeneral/anim/water/07.4bpp");
+
+const u16 *const gTilesetAnims_LPGeneral_Water[] = {
+    gTilesetAnims_LPGeneral_Water_Frame0,
+    gTilesetAnims_LPGeneral_Water_Frame1,
+    gTilesetAnims_LPGeneral_Water_Frame2,
+    gTilesetAnims_LPGeneral_Water_Frame3,
+    gTilesetAnims_LPGeneral_Water_Frame4,
+    gTilesetAnims_LPGeneral_Water_Frame5,
+    gTilesetAnims_LPGeneral_Water_Frame6,
+    gTilesetAnims_LPGeneral_Water_Frame7
+};
+
+static void QueueAnimTiles_LPGeneral_Water(u16 timer)
+{
+    u16 i = timer % ARRAY_COUNT(gTilesetAnims_LPGeneral_Water);
+    AppendTilesetAnimToBuffer(gTilesetAnims_LPGeneral_Water[i], (u16 *)(BG_VRAM + TILE_OFFSET_4BPP(432)), 30 * TILE_SIZE_4BPP);
+}
+
+//Shore
+const u16 gTilesetAnims_LPGeneral_Shore_Frame0[] = INCBIN_U16("data/tilesets/primary/lpgeneral/anim/shore/00.4bpp");
+const u16 gTilesetAnims_LPGeneral_Shore_Frame1[] = INCBIN_U16("data/tilesets/primary/lpgeneral/anim/shore/01.4bpp");
+const u16 gTilesetAnims_LPGeneral_Shore_Frame2[] = INCBIN_U16("data/tilesets/primary/lpgeneral/anim/shore/02.4bpp");
+const u16 gTilesetAnims_LPGeneral_Shore_Frame3[] = INCBIN_U16("data/tilesets/primary/lpgeneral/anim/shore/03.4bpp");
+const u16 gTilesetAnims_LPGeneral_Shore_Frame4[] = INCBIN_U16("data/tilesets/primary/lpgeneral/anim/shore/04.4bpp");
+const u16 gTilesetAnims_LPGeneral_Shore_Frame5[] = INCBIN_U16("data/tilesets/primary/lpgeneral/anim/shore/05.4bpp");
+const u16 gTilesetAnims_LPGeneral_Shore_Frame6[] = INCBIN_U16("data/tilesets/primary/lpgeneral/anim/shore/06.4bpp");
+const u16 gTilesetAnims_LPGeneral_Shore_Frame7[] = INCBIN_U16("data/tilesets/primary/lpgeneral/anim/shore/07.4bpp");
+
+const u16 *const gTilesetAnims_LPGeneral_Shore[] = {
+    gTilesetAnims_LPGeneral_Shore_Frame0,
+    gTilesetAnims_LPGeneral_Shore_Frame1,
+    gTilesetAnims_LPGeneral_Shore_Frame2,
+    gTilesetAnims_LPGeneral_Shore_Frame3,
+    gTilesetAnims_LPGeneral_Shore_Frame4,
+    gTilesetAnims_LPGeneral_Shore_Frame5,
+    gTilesetAnims_LPGeneral_Shore_Frame6,
+    gTilesetAnims_LPGeneral_Shore_Frame7
+};
+
+static void QueueAnimTiles_LPGeneral_Shore(u16 timer)
+{
+    u16 i = timer % ARRAY_COUNT(gTilesetAnims_LPGeneral_Shore);
+    AppendTilesetAnimToBuffer(gTilesetAnims_LPGeneral_Shore[i], (u16 *)(BG_VRAM + TILE_OFFSET_4BPP(464)), 10 * TILE_SIZE_4BPP);
+}
+
+//Waterfall
+const u16 gTilesetAnims_LPGeneral_Waterfall_Frame0[] = INCBIN_U16("data/tilesets/primary/lpgeneral/anim/waterfall/00.4bpp");
+const u16 gTilesetAnims_LPGeneral_Waterfall_Frame1[] = INCBIN_U16("data/tilesets/primary/lpgeneral/anim/waterfall/01.4bpp");
+const u16 gTilesetAnims_LPGeneral_Waterfall_Frame2[] = INCBIN_U16("data/tilesets/primary/lpgeneral/anim/waterfall/02.4bpp");
+const u16 gTilesetAnims_LPGeneral_Waterfall_Frame3[] = INCBIN_U16("data/tilesets/primary/lpgeneral/anim/waterfall/03.4bpp");
+
+const u16 *const gTilesetAnims_LPGeneral_Waterfall[] = {
+    gTilesetAnims_LPGeneral_Waterfall_Frame0,
+    gTilesetAnims_LPGeneral_Waterfall_Frame1,
+    gTilesetAnims_LPGeneral_Waterfall_Frame2,
+    gTilesetAnims_LPGeneral_Waterfall_Frame3
+};
+
+static void QueueAnimTiles_LPGeneral_Waterfall(u16 timer)
+{
+    u16 i = timer % ARRAY_COUNT(gTilesetAnims_LPGeneral_Waterfall);
+    AppendTilesetAnimToBuffer(gTilesetAnims_LPGeneral_Waterfall[i], (u16 *)(BG_VRAM + TILE_OFFSET_4BPP(496)), 6 * TILE_SIZE_4BPP);
+}
+
+//Misc
+const u16 gTilesetAnims_LPGeneral_Misc_Frame0[] = INCBIN_U16("data/tilesets/primary/lpgeneral/anim/misc/00.4bpp");
+const u16 gTilesetAnims_LPGeneral_Misc_Frame1[] = INCBIN_U16("data/tilesets/primary/lpgeneral/anim/misc/01.4bpp");
+const u16 gTilesetAnims_LPGeneral_Misc_Frame2[] = INCBIN_U16("data/tilesets/primary/lpgeneral/anim/misc/02.4bpp");
+const u16 gTilesetAnims_LPGeneral_Misc_Frame3[] = INCBIN_U16("data/tilesets/primary/lpgeneral/anim/misc/03.4bpp");
+
+const u16 *const gTilesetAnims_LPGeneral_Misc[] = {
+    gTilesetAnims_LPGeneral_Misc_Frame0,
+    gTilesetAnims_LPGeneral_Misc_Frame1,
+    gTilesetAnims_LPGeneral_Misc_Frame2,
+    gTilesetAnims_LPGeneral_Misc_Frame3
+};
+
+static void QueueAnimTiles_LPGeneral_Misc(u16 timer)
+{
+    u16 i = timer % ARRAY_COUNT(gTilesetAnims_LPGeneral_Misc);
+    AppendTilesetAnimToBuffer(gTilesetAnims_LPGeneral_Misc[i], (u16 *)(BG_VRAM + TILE_OFFSET_4BPP(480)), 10 * TILE_SIZE_4BPP);
+}
+
+//DEFINE ANIMS FOR LPGENERAL
+static void TilesetAnim_LPGeneral(u16 timer)
+{
+    if (timer % 16 == 0) {
+        QueueAnimTiles_LPGeneral_Flower(timer / 16);
+        QueueAnimTiles_LPGeneral_Water(timer / 16);
+        QueueAnimTiles_LPGeneral_Shore(timer / 16);
+        QueueAnimTiles_LPGeneral_Waterfall(timer / 16);
+        QueueAnimTiles_LPGeneral_Misc(timer / 16);
+    }
+}
+
+void InitTilesetAnim_LPGeneral(void)
+{
+    sPrimaryTilesetAnimCounter = 0;
+    sPrimaryTilesetAnimCounterMax = 512;
+    sPrimaryTilesetAnimCallback = TilesetAnim_LPGeneral;
+}
+
+/*----------------------------*/
+//LP_Caves
+//Lava
+const u16 gTilesetAnims_LPCaves_Lava_Frame0[] = INCBIN_U16("data/tilesets/secondary/lpcaves/anim/lava/00.4bpp");
+const u16 gTilesetAnims_LPCaves_Lava_Frame1[] = INCBIN_U16("data/tilesets/secondary/lpcaves/anim/lava/01.4bpp");
+const u16 gTilesetAnims_LPCaves_Lava_Frame2[] = INCBIN_U16("data/tilesets/secondary/lpcaves/anim/lava/02.4bpp");
+const u16 gTilesetAnims_LPCaves_Lava_Frame3[] = INCBIN_U16("data/tilesets/secondary/lpcaves/anim/lava/03.4bpp");
+
+const u16 *const gTilesetAnims_LPCaves_Lava[] = {
+    gTilesetAnims_LPCaves_Lava_Frame0,
+    gTilesetAnims_LPCaves_Lava_Frame1,
+    gTilesetAnims_LPCaves_Lava_Frame2,
+    gTilesetAnims_LPCaves_Lava_Frame3
+};
+
+static void QueueAnimTiles_LPCaves_Lava(u16 timer)
+{
+    u16 i = timer % ARRAY_COUNT(gTilesetAnims_LPCaves_Lava);
+    AppendTilesetAnimToBuffer(gTilesetAnims_LPCaves_Lava[i], (u16 *)(BG_VRAM + TILE_OFFSET_4BPP(928)), 4 * TILE_SIZE_4BPP);
+}
+
+//Lava 1
+const u16 gTilesetAnims_LPCaves_Lava_Frame4[] = INCBIN_U16("data/tilesets/secondary/lpcaves/anim/lava/04.4bpp");
+const u16 gTilesetAnims_LPCaves_Lava_Frame5[] = INCBIN_U16("data/tilesets/secondary/lpcaves/anim/lava/05.4bpp");
+const u16 gTilesetAnims_LPCaves_Lava_Frame6[] = INCBIN_U16("data/tilesets/secondary/lpcaves/anim/lava/06.4bpp");
+
+const u16 *const gTilesetAnims_LPCaves_Lava1[] = {
+    gTilesetAnims_LPCaves_Lava_Frame4,
+    gTilesetAnims_LPCaves_Lava_Frame5,
+    gTilesetAnims_LPCaves_Lava_Frame6
+};
+
+static void QueueAnimTiles_LPCaves_Lava1(u16 timer)
+{
+    u16 i = timer % ARRAY_COUNT(gTilesetAnims_LPCaves_Lava1);
+    AppendTilesetAnimToBuffer(gTilesetAnims_LPCaves_Lava1[i], (u16 *)(BG_VRAM + TILE_OFFSET_4BPP(NUM_TILES_IN_PRIMARY + 326)), 2 * TILE_SIZE_4BPP);
+}
+
+//Lava 2
+const u16 gTilesetAnims_LPCaves_Lava_Frame7[] = INCBIN_U16("data/tilesets/secondary/lpcaves/anim/lava/07.4bpp");
+const u16 gTilesetAnims_LPCaves_Lava_Frame8[] = INCBIN_U16("data/tilesets/secondary/lpcaves/anim/lava/08.4bpp");
+const u16 gTilesetAnims_LPCaves_Lava_Frame9[] = INCBIN_U16("data/tilesets/secondary/lpcaves/anim/lava/09.4bpp");
+
+const u16 *const gTilesetAnims_LPCaves_Lava2[] = {
+    gTilesetAnims_LPCaves_Lava_Frame7,
+    gTilesetAnims_LPCaves_Lava_Frame8,
+    gTilesetAnims_LPCaves_Lava_Frame9
+};
+
+static void QueueAnimTiles_LPCaves_Lava2(u16 timer)
+{
+    u16 i = timer % ARRAY_COUNT(gTilesetAnims_LPCaves_Lava2);
+    AppendTilesetAnimToBuffer(gTilesetAnims_LPCaves_Lava2[i], (u16 *)(BG_VRAM + TILE_OFFSET_4BPP(NUM_TILES_IN_PRIMARY + 343)), 2 * TILE_SIZE_4BPP);
+}
+
+//Smoke
+const u16 gTilesetAnims_LPCaves_Smoke_Frame0[] = INCBIN_U16("data/tilesets/secondary/lpcaves/anim/smoke/00.4bpp");
+const u16 gTilesetAnims_LPCaves_Smoke_Frame1[] = INCBIN_U16("data/tilesets/secondary/lpcaves/anim/smoke/01.4bpp");
+const u16 gTilesetAnims_LPCaves_Smoke_Frame2[] = INCBIN_U16("data/tilesets/secondary/lpcaves/anim/smoke/02.4bpp");
+const u16 gTilesetAnims_LPCaves_Smoke_Frame3[] = INCBIN_U16("data/tilesets/secondary/lpcaves/anim/smoke/03.4bpp");
+const u16 gTilesetAnims_LPCaves_Smoke_Frame4[] = INCBIN_U16("data/tilesets/secondary/lpcaves/anim/smoke/04.4bpp");
+const u16 gTilesetAnims_LPCaves_Smoke_Frame5[] = INCBIN_U16("data/tilesets/secondary/lpcaves/anim/smoke/05.4bpp");
+const u16 gTilesetAnims_LPCaves_Smoke_Frame6[] = INCBIN_U16("data/tilesets/secondary/lpcaves/anim/smoke/06.4bpp");
+const u16 gTilesetAnims_LPCaves_Smoke_Frame7[] = INCBIN_U16("data/tilesets/secondary/lpcaves/anim/smoke/07.4bpp");
+
+const u16 *const gTilesetAnims_LPCaves_Smoke[] = {
+    gTilesetAnims_LPCaves_Smoke_Frame0,
+    gTilesetAnims_LPCaves_Smoke_Frame1,
+    gTilesetAnims_LPCaves_Smoke_Frame2,
+    gTilesetAnims_LPCaves_Smoke_Frame3,
+    gTilesetAnims_LPCaves_Smoke_Frame4,
+    gTilesetAnims_LPCaves_Smoke_Frame5,
+    gTilesetAnims_LPCaves_Smoke_Frame6,
+    gTilesetAnims_LPCaves_Smoke_Frame7
+};
+
+static void QueueAnimTiles_LPCaves_Smoke(u16 timer)
+{
+    u16 i = timer % ARRAY_COUNT(gTilesetAnims_LPCaves_Smoke);
+    AppendTilesetAnimToBuffer(gTilesetAnims_LPCaves_Smoke[i], (u16 *)(BG_VRAM + TILE_OFFSET_4BPP(820)), 4 * TILE_SIZE_4BPP);
+}
+
+//Smoke2
+const u16 gTilesetAnims_LPCaves_Smoke2_Frame0[] = INCBIN_U16("data/tilesets/secondary/lpcaves/anim/smoke2/00.4bpp");
+const u16 gTilesetAnims_LPCaves_Smoke2_Frame1[] = INCBIN_U16("data/tilesets/secondary/lpcaves/anim/smoke2/01.4bpp");
+const u16 gTilesetAnims_LPCaves_Smoke2_Frame2[] = INCBIN_U16("data/tilesets/secondary/lpcaves/anim/smoke2/02.4bpp");
+const u16 gTilesetAnims_LPCaves_Smoke2_Frame3[] = INCBIN_U16("data/tilesets/secondary/lpcaves/anim/smoke2/03.4bpp");
+
+const u16 *const gTilesetAnims_LPCaves_Smoke2[] = {
+    gTilesetAnims_LPCaves_Smoke2_Frame0,
+    gTilesetAnims_LPCaves_Smoke2_Frame1,
+    gTilesetAnims_LPCaves_Smoke2_Frame2,
+    gTilesetAnims_LPCaves_Smoke2_Frame3
+};
+
+static void QueueAnimTiles_LPCaves_Smoke2(u16 timer)
+{
+    u16 i = timer % ARRAY_COUNT(gTilesetAnims_LPCaves_Smoke2);
+    AppendTilesetAnimToBuffer(gTilesetAnims_LPCaves_Smoke2[i], (u16 *)(BG_VRAM + TILE_OFFSET_4BPP(612)), 8 * TILE_SIZE_4BPP);
+}
+
+//DEFINE ANIMS FOR LPCaves
+static void TilesetAnim_LPCaves(u16 timer)
+{
+    if (timer % 16 == 0) {
+        QueueAnimTiles_LPCaves_Lava(timer / 16);
+        QueueAnimTiles_LPCaves_Lava1(timer / 16);
+        QueueAnimTiles_LPCaves_Lava2(timer / 16);
+        QueueAnimTiles_LPCaves_Smoke(timer / 16);
+        QueueAnimTiles_LPCaves_Smoke2(timer / 16);
+    }
+}
+
+void InitTilesetAnim_LPCaves(void)
+{
+    sSecondaryTilesetAnimCounter = 0;
+    sSecondaryTilesetAnimCounterMax = 512;
+    sSecondaryTilesetAnimCallback = TilesetAnim_LPCaves;
+}
+
+/*----------------------------*/
+//LP_Flamerny
+//Lava
+const u16 gTilesetAnims_LPFlamerny_Lava_Frame0[] = INCBIN_U16("data/tilesets/secondary/lpflamerny_city/anim/lava/00.4bpp");
+const u16 gTilesetAnims_LPFlamerny_Lava_Frame1[] = INCBIN_U16("data/tilesets/secondary/lpflamerny_city/anim/lava/01.4bpp");
+const u16 gTilesetAnims_LPFlamerny_Lava_Frame2[] = INCBIN_U16("data/tilesets/secondary/lpflamerny_city/anim/lava/02.4bpp");
+const u16 gTilesetAnims_LPFlamerny_Lava_Frame3[] = INCBIN_U16("data/tilesets/secondary/lpflamerny_city/anim/lava/03.4bpp");
+
+const u16 *const gTilesetAnims_LPFlamerny_Lava[] = {
+    gTilesetAnims_LPFlamerny_Lava_Frame0,
+    gTilesetAnims_LPFlamerny_Lava_Frame1,
+    gTilesetAnims_LPFlamerny_Lava_Frame2,
+    gTilesetAnims_LPFlamerny_Lava_Frame3
+};
+
+static void QueueAnimTiles_LPFlamerny_Lava(u16 timer)
+{
+    u16 i = timer % ARRAY_COUNT(gTilesetAnims_LPFlamerny_Lava);
+    AppendTilesetAnimToBuffer(gTilesetAnims_LPFlamerny_Lava[i], (u16 *)(BG_VRAM + TILE_OFFSET_4BPP(672)), 4 * TILE_SIZE_4BPP);
+}
+
+//Vapour
+const u16 gTilesetAnims_LPFlamerny_Vapour_Frame0[] = INCBIN_U16("data/tilesets/secondary/lpflamerny_city/anim/vapour/00.4bpp");
+const u16 gTilesetAnims_LPFlamerny_Vapour_Frame1[] = INCBIN_U16("data/tilesets/secondary/lpflamerny_city/anim/vapour/01.4bpp");
+const u16 gTilesetAnims_LPFlamerny_Vapour_Frame2[] = INCBIN_U16("data/tilesets/secondary/lpflamerny_city/anim/vapour/02.4bpp");
+const u16 gTilesetAnims_LPFlamerny_Vapour_Frame3[] = INCBIN_U16("data/tilesets/secondary/lpflamerny_city/anim/vapour/03.4bpp");
+
+const u16 *const gTilesetAnims_LPFlamerny_Vapour[] = {
+    gTilesetAnims_LPFlamerny_Vapour_Frame0,
+    gTilesetAnims_LPFlamerny_Vapour_Frame1,
+    gTilesetAnims_LPFlamerny_Vapour_Frame2,
+    gTilesetAnims_LPFlamerny_Vapour_Frame3
+};
+
+static void QueueAnimTiles_LPFlamerny_Vapour(u16 timer)
+{
+    u16 i = timer % ARRAY_COUNT(gTilesetAnims_LPFlamerny_Vapour);
+    AppendTilesetAnimToBuffer(gTilesetAnims_LPFlamerny_Vapour[i], (u16 *)(BG_VRAM + TILE_OFFSET_4BPP(800)), 4 * TILE_SIZE_4BPP);
+}
+
+//Vapour2
+const u16 gTilesetAnims_LPFlamerny_Vapour2_Frame0[] = INCBIN_U16("data/tilesets/secondary/lpflamerny_city/anim/vapour2/00.4bpp");
+const u16 gTilesetAnims_LPFlamerny_Vapour2_Frame1[] = INCBIN_U16("data/tilesets/secondary/lpflamerny_city/anim/vapour2/01.4bpp");
+const u16 gTilesetAnims_LPFlamerny_Vapour2_Frame2[] = INCBIN_U16("data/tilesets/secondary/lpflamerny_city/anim/vapour2/02.4bpp");
+const u16 gTilesetAnims_LPFlamerny_Vapour2_Frame3[] = INCBIN_U16("data/tilesets/secondary/lpflamerny_city/anim/vapour2/03.4bpp");
+
+const u16 *const gTilesetAnims_LPFlamerny_Vapour2[] = {
+    gTilesetAnims_LPFlamerny_Vapour2_Frame0,
+    gTilesetAnims_LPFlamerny_Vapour2_Frame1,
+    gTilesetAnims_LPFlamerny_Vapour2_Frame2,
+    gTilesetAnims_LPFlamerny_Vapour2_Frame3
+};
+
+static void QueueAnimTiles_LPFlamerny_Vapour2(u16 timer)
+{
+    u16 i = timer % ARRAY_COUNT(gTilesetAnims_LPFlamerny_Vapour2);
+    AppendTilesetAnimToBuffer(gTilesetAnims_LPFlamerny_Vapour2[i], (u16 *)(BG_VRAM + TILE_OFFSET_4BPP(804)), 4 * TILE_SIZE_4BPP);
+}
+
+//DEFINE ANIMS FOR LPFlamerny
+static void TilesetAnim_LPFlamerny(u16 timer)
+{
+    if (timer % 16 == 0) {
+        QueueAnimTiles_LPFlamerny_Lava(timer / 16);
+        QueueAnimTiles_LPFlamerny_Vapour(timer / 16);
+        QueueAnimTiles_LPFlamerny_Vapour2(timer / 16);
+    }
+}
+
+void InitTilesetAnim_LPFlamerny(void)
+{
+    sSecondaryTilesetAnimCounter = 0;
+    sSecondaryTilesetAnimCounterMax = 512;
+    sSecondaryTilesetAnimCallback = TilesetAnim_LPFlamerny;
+}

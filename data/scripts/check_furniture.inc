@@ -25,3 +25,12 @@ EventScript_ShopShelf::
 EventScript_Blueprint::
 	msgbox Text_Blueprint, MSGBOX_SIGN
 	end
+
+EventScript_M_Grave::
+	msgbox Text_M_grave, MSGBOX_SIGN,
+	end
+
+EventScript_Blood::
+	msgbox Text_Blood, MSGBOX_SIGN,
+	end
+

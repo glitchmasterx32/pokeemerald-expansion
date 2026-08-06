@@ -25,3 +25,18 @@ Text_ShopShelf:
 Text_Blueprint:
 	.string "A blueprint of some sort?\n"
 	.string "It's too complicated!$"
+
+Text_Blood:
+	.string "The blood splatters on the ground, its\n"
+	.string "vivid red stark against everything\l"
+	.string "else.$"
+	
+ Text_M_grave:
+   .string "R.I.P\p"
+	.string "{COLOR BLUE}{SHADOW LIGHT_GRAY}Elysia Aurora Valente\p"
+	.string "{COLOR DARK_GRAY}{SHADOW LIGHT_GRAY}There is a message left on the grave.\p"
+	.string "{COLOR BLUE}{SHADOW LIGHT_GRAY}Mom, your legacy lives on through me,\n"
+	.string "and every breath I take will be in\l"
+	.string "pursuit of your vengeance. The {COLOR RED}{SHADOW LIGHT_GRAY}Crimson\l"
+	.string "Requiem {COLOR BLUE}{SHADOW LIGHT_GRAY}has begun, and it will not end\l"
+	.string "until justice is served.$"
