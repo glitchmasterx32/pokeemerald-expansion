@@ -1,6 +1,7 @@
 #include "global.h"
 #include "battle_pyramid.h"
 #include "bg.h"
+#include "event_data.h"
 #include "fieldmap.h"
 #include "fldeff.h"
 #include "fldeff_misc.h"
@@ -979,34 +980,88 @@ static void UNUSED ApplyGlobalTintToPaletteSlot(u8 slot, u8 count)
 
 static void LoadTilesetPalette(struct Tileset const *tileset, u16 destOffset, u16 size, bool8 skipFaded, u32 numPalsInPrimary)
 {
-    if (tileset)
-    {
-        if (tileset->isSecondary == FALSE)
-        {
-            if (skipFaded)
-                CpuFastCopy(tileset->palettes, &gPlttBufferUnfaded[destOffset], size); // always word-aligned
-            else
-                LoadPaletteFast(tileset->palettes, destOffset, size);
-            gPlttBufferFaded[destOffset] = gPlttBufferUnfaded[destOffset] = RGB_BLACK;
-            ApplyGlobalTintToPaletteEntries(destOffset + 1, (size - 2) >> 1);
-        }
-        else if (tileset->isSecondary == TRUE)
-        {
-            // All 'gTilesetPalettes_' arrays should have ALIGNED(4) in them,
-            // but we use SmartCopy here just in case they don't
-            if (skipFaded)
-                CpuCopy16(tileset->palettes[numPalsInPrimary], &gPlttBufferUnfaded[destOffset], size);
-            else
-                LoadPaletteFast(tileset->palettes[numPalsInPrimary], destOffset, size);
-        }
-        else
-        {
-            LoadPalette((const u16 *)tileset->palettes, destOffset, size);
-            ApplyGlobalTintToPaletteEntries(destOffset, size >> 1);
-        }
-    }
+    if (!tileset)
+        return;
+
+    u8 season = getCurrentSeason();
+
+    const u16 *palette = NULL;
+    const u16 (*paletteTable)[16] = tileset->palettes;
+
+switch (getCurrentSeason())
+{
+case SEASON_SPRING:
+    if (tileset->palettes_spring)
+        paletteTable = tileset->palettes_spring;
+    break;
+
+case SEASON_AUTUMN:
+    if (tileset->palettes_autumn)
+        paletteTable = tileset->palettes_autumn;
+    break;
+
+case SEASON_WINTER:
+    if (tileset->palettes_winter)
+        paletteTable = tileset->palettes_winter;
+    break;
+
+case SEASON_SUMMER:
+default:
+    break;
 }
 
+    if (tileset->isSecondary == FALSE)
+    {
+        palette = paletteTable[0];
+
+        if (skipFaded)
+            CpuFastCopy(palette, &gPlttBufferUnfaded[destOffset], size);
+        else
+            LoadPaletteFast(palette, destOffset, size);
+
+        gPlttBufferFaded[destOffset] = gPlttBufferUnfaded[destOffset] = RGB_BLACK;
+        ApplyGlobalTintToPaletteEntries(destOffset + 1, (size - 2) >> 1);
+    }
+    else if (tileset->isSecondary == TRUE)
+    {
+        palette = paletteTable[numPalsInPrimary];
+
+        if (skipFaded)
+            CpuCopy16(palette, &gPlttBufferUnfaded[destOffset], size);
+        else
+            LoadPaletteFast(palette, destOffset, size);
+    }
+    else
+    {
+        // Compressed palettes
+        const void *compressedPalette = tileset->palettes;
+
+        switch (season)
+        {
+        case SEASON_SPRING:
+            if (tileset->palettes_spring)
+                compressedPalette = tileset->palettes_spring;
+            break;
+
+        case SEASON_AUTUMN:
+            if (tileset->palettes_autumn)
+                compressedPalette = tileset->palettes_autumn;
+            break;
+
+        case SEASON_WINTER:
+            if (tileset->palettes_winter)
+                compressedPalette = tileset->palettes_winter;
+            break;
+
+        case SEASON_SUMMER:
+        default:
+            break;
+        }
+
+        LoadPalette((const u16 *)compressedPalette, destOffset, size);
+        ApplyGlobalTintToPaletteEntries(destOffset, size >> 1);
+    }
+}
 void CopyPrimaryTilesetToVram(struct MapLayout const *mapLayout)
 {
     CopyTilesetToVram(mapLayout->primaryTileset, GetNumTilesInPrimary(mapLayout), 0);

@@ -274,3 +274,8 @@ bool8 FlagGet(u16 id)
 
     return TRUE;
 }
+
+
+u8 getCurrentSeason(void){
+    return VarGet(VAR_CURRENT_SEASON);
+}

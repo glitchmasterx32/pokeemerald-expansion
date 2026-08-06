@@ -1552,6 +1552,9 @@ const struct Tileset gTileset_LPGeneral =
     .metatiles = gMetatiles_LPGeneral,
     .metatileAttributes = gMetatileAttributes_LPGeneral,
     .callback = InitTilesetAnim_LPGeneral,
+    .palettes_spring = gTilesetPalettes_General_Spring,
+    .palettes_autumn = gTilesetPalettes_General_Autumn,
+    .palettes_winter = gTilesetPalettes_General_Winter,
 };
 
 const struct Tileset gTileset_LPYellowTown =

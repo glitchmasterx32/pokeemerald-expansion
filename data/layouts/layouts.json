@@ -17,7 +17,7 @@
       "name": "MauvilleCity_Layout",
       "width": 40,
       "height": 20,
-      "primary_tileset": "gTileset_General",
+      "primary_tileset": "gTileset_LPGeneral",
       "secondary_tileset": "gTileset_Mauville",
       "border_filepath": "data/layouts/MauvilleCity/border.bin",
       "blockdata_filepath": "data/layouts/MauvilleCity/map.bin",

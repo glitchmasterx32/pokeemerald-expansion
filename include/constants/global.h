@@ -227,6 +227,13 @@ enum Connection
     CONNECTION_EMERGE
 };
 
+//Seasons
+
+#define SEASON_SUMMER 0
+#define SEASON_SPRING 1
+#define SEASON_AUTUMN 2
+#define SEASON_WINTER 3
+
 #if TESTING
 #include "config/test.h"
 #endif
