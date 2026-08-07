@@ -2747,6 +2747,15 @@ bool32 TryFieldEffects(enum FieldEffectCases caseId)
             BattleScriptPushCursorAndCallback(BattleScript_OverworldTerrain);
             effect = TRUE;
         }
+        else if (GetCurrentWeather() == WEATHER_SPRING)
+        {
+            // overworld weather started rain, so just do electric terrain anim
+            gFieldStatuses = STATUS_FIELD_GRASSY_TERRAIN;
+            gFieldTimers.terrainTimer = 0;
+            gBattleCommunication[MULTISTRING_CHOOSER] = B_MSG_TERRAIN_SET_GRASSY;
+            BattleScriptPushCursorAndCallback(BattleScript_OverworldTerrain);
+            effect = TRUE;
+        }
         else if (B_OVERWORLD_FOG >= GEN_8
               && (GetCurrentWeather() == WEATHER_FOG_HORIZONTAL || GetCurrentWeather() == WEATHER_FOG_DIAGONAL)
               && !(gFieldStatuses & STATUS_FIELD_MISTY_TERRAIN))
@@ -2778,6 +2787,14 @@ bool32 TryFieldEffects(enum FieldEffectCases caseId)
                 {
                     gBattleWeather = B_WEATHER_SANDSTORM;
                     gBattleScripting.animArg1 = B_ANIM_SANDSTORM_CONTINUES;
+                    effect = TRUE;
+                }
+                break;
+            case WEATHER_BLIZZARD:
+                if (!(gBattleWeather & B_WEATHER_HAIL))
+                {
+                    gBattleWeather = B_WEATHER_HAIL;
+                    gBattleScripting.animArg1 = B_ANIM_HAIL_CONTINUES;
                     effect = TRUE;
                 }
                 break;

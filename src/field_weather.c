@@ -142,6 +142,10 @@ static const struct WeatherCallbacks sWeatherFuncs[] =
     [WEATHER_DROUGHT]            = {Drought_InitVars,       Drought_Main,       Drought_InitAll,       Drought_Finish},
     [WEATHER_DOWNPOUR]           = {Downpour_InitVars,      Thunderstorm_Main,  Downpour_InitAll,      Thunderstorm_Finish},
     [WEATHER_UNDERWATER_BUBBLES] = {Bubbles_InitVars,       Bubbles_Main,       Bubbles_InitAll,       Bubbles_Finish},
+    [WEATHER_SPRING]               = {PinkLeaves_InitVars,    PinkLeaves_Main,    PinkLeaves_InitAll,    PinkLeaves_Finish},
+    [WEATHER_AUTUMN]               = {PinkLeaves_InitVars,    PinkLeaves_Main,    PinkLeaves_InitAll,    PinkLeaves_Finish},
+    [WEATHER_BLIZZARD]             = {Sandstorm_InitVars,      Sandstorm_Main,      Sandstorm_InitAll,      Sandstorm_Finish},
+
 };
 
 void (*const gWeatherPalStateFuncs[])(void) =
@@ -386,7 +390,10 @@ static void FadeInScreenWithWeather(void)
             gWeatherPtr->palProcessingState = WEATHER_PAL_STATE_IDLE;
         }
         break;
+    case WEATHER_AUTUMN:    
+    case WEATHER_SPRING:
     case WEATHER_SNOW:
+    case WEATHER_BLIZZARD:
     case WEATHER_VOLCANIC_ASH:
     case WEATHER_SANDSTORM:
     case WEATHER_FOG_DIAGONAL:
@@ -1217,6 +1224,9 @@ static const u8 sWeatherNames[WEATHER_COUNT][24] = {
     [WEATHER_ROUTE119_CYCLE]     = _("ROUTE119 CYCLE"),
     [WEATHER_ROUTE123_CYCLE]     = _("ROUTE123 CYCLE"),
     [WEATHER_FOG]                = _("FOG"),
+    [WEATHER_SPRING]                = _("SPRING"),
+    [WEATHER_AUTUMN]                = _("AUTUMN"),
+    [WEATHER_BLIZZARD]           = _("BLIZZARD"),
 };
 
 static const u8 sDebugText_WeatherNotDefined[] = _("NOT DEFINED!!!");

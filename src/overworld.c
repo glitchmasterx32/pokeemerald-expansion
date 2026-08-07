@@ -919,6 +919,7 @@ void LoadMapFromCameraTransition(u8 mapGroup, u8 mapNum)
 
     DoTimeBasedEvents();
     SetSavedWeatherFromCurrMapHeader();
+    TryApplySeasonalWeather();
     ChooseAmbientCrySpecies();
     SetDefaultFlashLevel();
     Overworld_ClearSavedMusic();
@@ -994,7 +995,9 @@ static void LoadMapFromWarp(bool32 a1)
 
     if (a1 != TRUE)
         DoTimeBasedEvents();
+
     SetSavedWeatherFromCurrMapHeader();
+    TryApplySeasonalWeather();
     ChooseAmbientCrySpecies();
     if (isOutdoors)
         FlagClear(FLAG_SYS_USE_FLASH);
@@ -4166,3 +4169,33 @@ static void UpdateBlend(void)
                             | BLDCNT_TGT2_OBJ | BLDCNT_EFFECT_BLEND | BLDCNT_TGT1_BG1);
     SetGpuReg(REG_OFFSET_BLDALPHA, BLDALPHA_BLEND(sOverlayState.eva , sOverlayState.evb));
     }
+
+    void TryApplySeasonalWeather(void)
+{   
+    u8 season = getCurrentSeason();
+    u8 maptype = gMapHeader.mapType;
+
+    if (gMapHeader.weather == WEATHER_NONE
+     && (maptype == MAP_TYPE_CITY
+      || maptype == MAP_TYPE_TOWN
+      || maptype == MAP_TYPE_ROUTE
+      || maptype == MAP_TYPE_OCEAN_ROUTE))
+    {
+        switch (season)
+        {
+        case SEASON_SPRING:
+            SetWeather(WEATHER_SPRING);
+            break;
+        case SEASON_AUTUMN:
+            SetWeather(WEATHER_AUTUMN);
+            break;
+        case SEASON_WINTER:
+            SetWeather(WEATHER_SNOW);
+            break;
+        case SEASON_SUMMER:
+        default:
+            SetWeather(WEATHER_SUNNY);
+            break;
+        }
+    }
+}
