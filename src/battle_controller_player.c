@@ -2559,7 +2559,7 @@ const u8 *BattleUI_GetTypeEffectivenessSymbol(enum BattlerId battler, enum Move 
     if (IsBattleMoveStatus(move))
         return noIcon;
 
-    enum BattlerId battlerDef = BATTLE_OPPOSITE(battler);
+    enum BattlerId battlerDef = GetOppositeBattler(battler);
 
     if (GetBattlerCoordsIndex(battlerDef) == BATTLE_COORDS_DOUBLES)
         battlerDef = gMultiUsePlayerCursor;
