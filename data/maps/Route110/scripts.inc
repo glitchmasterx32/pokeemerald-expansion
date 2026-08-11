@@ -15,7 +15,7 @@ Route110_OnTransition:
 	end
 
 Route110_EventScript_SaveCyclingMusic::
-	savebgm MUS_CYCLING
+	savebgm MUS_DP_CYCLING
 	return
 
 Route110_OnFrame:
@@ -390,7 +390,7 @@ Route110_EventScript_RivalScene::
 	end
 
 Route110_EventScript_PlayMayMusic::
-	playbgm MUS_ENCOUNTER_MAY, TRUE
+	playbgm MUS_DP_DAWN, TRUE
 	return
 
 Route110_EventScript_PlayBrendanMusic::

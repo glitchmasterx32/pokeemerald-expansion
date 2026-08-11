@@ -18,7 +18,7 @@ Route23_EventScript_MissingBadge::
 Route23_EventScript_AlreadyRecognizedBoulderBadge::
 	message Text_OhThatsBadgeGoRightAhead
 	waitmessage
-	playfanfare MUS_LEVEL_UP
+	playfanfare MUS_DP_LEVEL_UP
 	waitfanfare
 	waitbuttonpress
 	release
@@ -99,7 +99,7 @@ Route23_EventScript_CheckEarthBadge::
 Route23_EventScript_RecognizeBoulderBadge::
 	message Text_OhThatsBadgeGoRightAhead
 	waitmessage
-	playfanfare MUS_LEVEL_UP
+	playfanfare MUS_DP_LEVEL_UP
 	waitfanfare
 	waitbuttonpress
 	copyvar VAR_MAP_SCENE_ROUTE23, VAR_TEMP_1
@@ -194,7 +194,7 @@ Route23_EventScript_MissingBadgeTrigger::
 Route23_EventScript_RecognizeBoulderBadgeTrigger::
 	message Text_OhThatsBadgeGoRightAhead
 	waitmessage
-	playfanfare MUS_LEVEL_UP
+	playfanfare MUS_DP_LEVEL_UP
 	waitfanfare
 	waitbuttonpress
 	copyvar VAR_MAP_SCENE_ROUTE23, VAR_TEMP_1
@@ -236,7 +236,7 @@ Text_OnlyPassWithBadgeDontHaveYet::
 Text_OnlyPassWithBadgeOhGoAhead::
 	.string "You can pass here only if you have\n"
 	.string "the {STR_VAR_1}.\p"
-	.string "Oh! That is the {STR_VAR_1}!{PAUSE_MUSIC}{PLAY_BGM}{MUS_LEVEL_UP}{PAUSE 0x60}{RESUME_MUSIC}\p"
+	.string "Oh! That is the {STR_VAR_1}!{PAUSE_MUSIC}{PLAY_BGM}{MUS_DP_LEVEL_UP}{PAUSE 0x60}{RESUME_MUSIC}\p"
 	.string "Okay, then.\n"
 	.string "Please, go right ahead.$"
 

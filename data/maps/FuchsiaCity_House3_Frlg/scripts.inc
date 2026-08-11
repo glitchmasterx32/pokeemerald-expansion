@@ -30,7 +30,7 @@ FuchsiaCity_House3_EventScript_ChooseMonForMoveDeleter::
 
 FuchsiaCity_House3_EventScript_ForgetMove::
 	special MoveDeleterForgetMove
-	playfanfare MUS_MOVE_DELETED
+	playfanfare MUS_DP_MOVE_DELETED
 	waitfanfare
 	msgbox FuchsiaCity_House3_Text_MonHasForgottenMoveCompletely
 	release

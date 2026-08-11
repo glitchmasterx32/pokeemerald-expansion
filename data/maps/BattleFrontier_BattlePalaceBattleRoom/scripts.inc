@@ -81,7 +81,7 @@ BattleFrontier_BattlePalaceBattleRoom_EventScript_DefeatedOpponent::
 	special LoadPlayerParty
 	special SavePlayerParty
 	frontier_setpartyorder FRONTIER_PARTY_SIZE
-	playfanfare MUS_HEAL
+	playfanfare MUS_DP_HEAL
 	waitfanfare
 	special HealPlayerParty
 BattleFrontier_BattlePalaceBattleRoom_EventScript_AskReadyForOpponent::

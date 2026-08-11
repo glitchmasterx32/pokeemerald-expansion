@@ -1282,9 +1282,9 @@ u16 GetCurrLocationDefaultMusic(void)
     else
     {
         if (gSaveBlock1Ptr->pos.x < 24)
-            return MUS_ROUTE110;
+            return MUS_PETALBURG;
         else
-            return MUS_ROUTE119;
+            return MUS_OLDALE;
     }
 }
 
@@ -1299,9 +1299,9 @@ u16 GetWarpDestinationMusic(void)
     {
         if (gSaveBlock1Ptr->location.mapGroup == MAP_GROUP(MAP_MAUVILLE_CITY)
          && gSaveBlock1Ptr->location.mapNum == MAP_NUM(MAP_MAUVILLE_CITY))
-            return MUS_ROUTE110;
+            return MUS_PETALBURG;
         else
-            return MUS_ROUTE119;
+            return MUS_OLDALE;
     }
 }
 
@@ -1329,7 +1329,7 @@ void Overworld_PlaySpecialMapMusic(void)
         else if (GetCurrentMapType() == MAP_TYPE_UNDERWATER)
             music = MUS_UNDERWATER;
         else if (TestPlayerAvatarFlags(PLAYER_AVATAR_FLAG_SURFING))
-            music = (IS_FRLG ? MUS_RG_SURF : MUS_SURF);
+            music = (IS_FRLG ? MUS_RG_SURF : MUS_DP_SURF);
     }
 
     if (music != GetCurrentMapMusic())
@@ -1362,10 +1362,10 @@ static void TransitionMapMusic(void)
         u16 currentMusic = GetCurrentMapMusic();
         if (newMusic != MUS_ABNORMAL_WEATHER && newMusic != MUS_NONE)
         {
-            if (currentMusic == MUS_UNDERWATER || currentMusic == (IS_FRLG ? MUS_RG_SURF : MUS_SURF))
+            if (currentMusic == MUS_UNDERWATER || currentMusic == (IS_FRLG ? MUS_RG_SURF : MUS_DP_SURF))
                 return;
             if (TestPlayerAvatarFlags(PLAYER_AVATAR_FLAG_SURFING))
-                newMusic = (IS_FRLG ? MUS_RG_SURF : MUS_SURF);
+                newMusic = (IS_FRLG ? MUS_RG_SURF : MUS_DP_SURF);
         }
         if (newMusic != currentMusic)
         {
@@ -1406,7 +1406,7 @@ void TryFadeOutOldMapMusic(void)
     u16 warpMusic = GetWarpDestinationMusic();
     if (FlagGet(FLAG_DONT_TRANSITION_MUSIC) != TRUE && warpMusic != GetCurrentMapMusic())
     {
-        if (currentMusic == MUS_SURF
+        if (currentMusic == MUS_DP_SURF
             && VarGet(VAR_SKY_PILLAR_STATE) == 2
             && gSaveBlock1Ptr->location.mapGroup == MAP_GROUP(MAP_SOOTOPOLIS_CITY)
             && gSaveBlock1Ptr->location.mapNum == MAP_NUM(MAP_SOOTOPOLIS_CITY)

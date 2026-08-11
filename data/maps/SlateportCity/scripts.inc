@@ -143,7 +143,7 @@ SlateportCity_EventScript_EffortRibbonWoman::
 	specialvar VAR_RESULT, Special_AreLeadMonEVsMaxedOut
 	call_if_eq VAR_RESULT, FALSE, SlateportCity_EventScript_MonEVsNotMaxed
 	msgbox SlateportCity_Text_PleaseGiveItThisEffortRibbon, MSGBOX_DEFAULT
-	playfanfare MUS_OBTAIN_ITEM
+	playfanfare MUS_DP_OBTAIN_ITEM
 	message SlateportCity_Text_ReceivedEffortRibbon
 	waitfanfare
 	msgbox SlateportCity_Text_PutEffortRibbonOnMon, MSGBOX_DEFAULT

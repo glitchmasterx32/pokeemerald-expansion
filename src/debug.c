@@ -2728,7 +2728,7 @@ static void DebugAction_Give_Item_SelectQuantity(u8 taskId)
     {
         DestroyItemIcon(taskId);
 
-        PlaySE(MUS_LEVEL_UP);
+        PlaySE(MUS_DP_LEVEL_UP);
         AddBagItem(itemId, gTasks[taskId].tInput);
         DebugAction_DestroyExtraWindow(taskId);
     }
@@ -3001,7 +3001,7 @@ static void DebugAction_Give_Pokemon_SelectLevel(u8 taskId)
         FreeAndDestroyMonIconSprite(&gSprites[gTasks[taskId].tSpriteId]);
         if (gTasks[taskId].tIsComplex == FALSE)
         {
-            PlaySE(MUS_LEVEL_UP);
+            PlaySE(MUS_DP_LEVEL_UP);
             ScriptGiveMon(sDebugMonData->species, gTasks[taskId].tInput, ITEM_NONE);
             // Set flag for user convenience
             FlagSet(FLAG_SYS_POKEMON_GET);
@@ -3465,7 +3465,7 @@ static void DebugAction_Give_Pokemon_Move(u8 taskId)
             gTasks[taskId].tInput = 0;
             gTasks[taskId].tDigit = 0;
 
-            PlaySE(MUS_LEVEL_UP);
+            PlaySE(MUS_DP_LEVEL_UP);
             gTasks[taskId].func = DebugAction_Give_Pokemon_ComplexCreateMon;
         }
     }
@@ -3636,7 +3636,7 @@ static void DebugAction_Give_Decoration_SelectId(u8 taskId)
     {
         DestroyItemIcon(taskId);
 
-        PlaySE(MUS_LEVEL_UP);
+        PlaySE(MUS_DP_LEVEL_UP);
         DecorationAdd(gTasks[taskId].tInput);
         DebugAction_DestroyExtraWindow(taskId);
     }
@@ -3866,7 +3866,7 @@ static void DebugAction_PCBag_Fill_PocketKeyItems(u8 taskId)
 
 static void DebugAction_PCBag_ClearBag(u8 taskId)
 {
-    PlaySE(MUS_LEVEL_UP);
+    PlaySE(MUS_DP_LEVEL_UP);
     ClearBag();
 }
 
@@ -4053,83 +4053,35 @@ static void DebugAction_DestroyFollowerNPC(u8 taskId)
 
 
 #define SOUND_LIST_BGM              \
-    X(MUS_LITTLEROOT_TEST)          \
-    X(MUS_GSC_ROUTE38)              \
-    X(MUS_CAUGHT)                   \
-    X(MUS_VICTORY_WILD)             \
-    X(MUS_VICTORY_GYM_LEADER)       \
-    X(MUS_VICTORY_LEAGUE)           \
-    X(MUS_C_COMM_CENTER)            \
-    X(MUS_GSC_PEWTER)               \
-    X(MUS_C_VS_LEGEND_BEAST)        \
-    X(MUS_ROUTE101)                 \
-    X(MUS_ROUTE110)                 \
-    X(MUS_ROUTE120)                 \
     X(MUS_PETALBURG)                \
     X(MUS_OLDALE)                   \
-    X(MUS_GYM)                      \
-    X(MUS_SURF)                     \
     X(MUS_PETALBURG_WOODS)          \
-    X(MUS_LEVEL_UP)                 \
-    X(MUS_HEAL)                     \
-    X(MUS_OBTAIN_BADGE)             \
-    X(MUS_OBTAIN_ITEM)              \
-    X(MUS_EVOLVED)                  \
-    X(MUS_OBTAIN_TMHM)              \
-    X(MUS_LILYCOVE_MUSEUM)          \
+    X(MUS_PETALBURG_MUSEUM)          \
     X(MUS_ROUTE122)                 \
     X(MUS_OCEANIC_MUSEUM)           \
-    X(MUS_EVOLUTION_INTRO)          \
-    X(MUS_EVOLUTION)                \
-    X(MUS_MOVE_DELETED)             \
-    X(MUS_ENCOUNTER_GIRL)           \
-    X(MUS_ENCOUNTER_MALE)           \
     X(MUS_ABANDONED_SHIP)           \
     X(MUS_FORTREE)                  \
     X(MUS_BIRCH_LAB)                \
-    X(MUS_B_TOWER_RS)               \
-    X(MUS_ENCOUNTER_SWIMMER)        \
     X(MUS_CAVE_OF_ORIGIN)           \
     X(MUS_OBTAIN_BERRY)             \
     X(MUS_AWAKEN_LEGEND)            \
-    X(MUS_SLOTS_JACKPOT)            \
-    X(MUS_SLOTS_WIN)                \
     X(MUS_TOO_BAD)                  \
     X(MUS_ROULETTE)                 \
-    X(MUS_LINK_CONTEST_P1)          \
-    X(MUS_LINK_CONTEST_P2)          \
-    X(MUS_LINK_CONTEST_P3)          \
-    X(MUS_LINK_CONTEST_P4)          \
-    X(MUS_ENCOUNTER_RICH)           \
     X(MUS_VERDANTURF)               \
     X(MUS_RUSTBORO)                 \
-    X(MUS_POKE_CENTER)              \
-    X(MUS_ROUTE104)                 \
-    X(MUS_ROUTE119)                 \
-    X(MUS_CYCLING)                  \
-    X(MUS_POKE_MART)                \
     X(MUS_LITTLEROOT)               \
     X(MUS_MT_CHIMNEY)               \
-    X(MUS_ENCOUNTER_FEMALE)         \
-    X(MUS_LILYCOVE)                 \
     X(MUS_DESERT)                   \
     X(MUS_HELP)                     \
     X(MUS_UNDERWATER)               \
-    X(MUS_VICTORY_TRAINER)          \
     X(MUS_TITLE)                    \
     X(MUS_INTRO)                    \
-    X(MUS_ENCOUNTER_MAY)            \
-    X(MUS_ENCOUNTER_INTENSE)        \
-    X(MUS_ENCOUNTER_COOL)           \
-    X(MUS_ROUTE113)                 \
     X(MUS_ENCOUNTER_AQUA)           \
-    X(MUS_FOLLOW_ME)                \
     X(MUS_ENCOUNTER_BRENDAN)        \
     X(MUS_EVER_GRANDE)              \
-    X(MUS_ENCOUNTER_SUSPICIOUS)     \
+    X(MUS_PMD_DARK_CRATER)     \
     X(MUS_VICTORY_AQUA_MAGMA)       \
     X(MUS_CABLE_CAR)                \
-    X(MUS_GAME_CORNER)              \
     X(MUS_DEWFORD)                  \
     X(MUS_SAFARI_ZONE)              \
     X(MUS_VICTORY_ROAD)             \
@@ -4149,20 +4101,12 @@ static void DebugAction_DestroyFollowerNPC(u8 taskId)
     X(MUS_ABNORMAL_WEATHER)         \
     X(MUS_WEATHER_GROUDON)          \
     X(MUS_SOOTOPOLIS)               \
-    X(MUS_CONTEST_RESULTS)          \
     X(MUS_HALL_OF_FAME_ROOM)        \
-    X(MUS_TRICK_HOUSE)              \
-    X(MUS_ENCOUNTER_TWINS)          \
-    X(MUS_ENCOUNTER_ELITE_FOUR)     \
-    X(MUS_ENCOUNTER_HIKER)          \
-    X(MUS_CONTEST_LOBBY)            \
-    X(MUS_ENCOUNTER_INTERVIEWER)    \
-    X(MUS_ENCOUNTER_CHAMPION)       \
+    X(MUS_DBZ_CELL)              \
     X(MUS_CREDITS)                  \
     X(MUS_END)                      \
     X(MUS_B_FRONTIER)               \
     X(MUS_B_ARENA)                  \
-    X(MUS_OBTAIN_B_POINTS)          \
     X(MUS_REGISTER_MATCH_CALL)      \
     X(MUS_B_PYRAMID)                \
     X(MUS_B_PYRAMID_TOP)            \
@@ -4181,10 +4125,10 @@ static void DebugAction_DestroyFollowerNPC(u8 taskId)
     X(MUS_VS_AQUA_MAGMA)            \
     X(MUS_VS_TRAINER)               \
     X(MUS_VS_GYM_LEADER)            \
-    X(MUS_VS_CHAMPION)              \
+    X(MUS_PMD_VS_DUSKNOIR)              \
     X(MUS_VS_REGI)                  \
     X(MUS_VS_KYOGRE_GROUDON)        \
-    X(MUS_VS_RIVAL)                 \
+    X(MUS_PMD_DARK_PATH)                 \
     X(MUS_VS_ELITE_FOUR)            \
     X(MUS_VS_AQUA_MAGMA_LEADER)     \
     X(MUS_RG_FOLLOW_ME)             \
@@ -4261,7 +4205,453 @@ static void DebugAction_DestroyFollowerNPC(u8 taskId)
     X(MUS_RG_ENCOUNTER_DEOXYS)      \
     X(MUS_RG_TRAINER_TOWER)         \
     X(MUS_RG_SLOW_PALLET)           \
-    X(MUS_RG_TEACHY_TV_MENU)
+    X(MUS_RG_TEACHY_TV_MENU)        \
+    X(MUS_DP_TWINLEAF_DAY) \
+    X(MUS_DP_SANDGEM_DAY) \
+    X(MUS_DP_FLOAROMA_DAY) \
+    X(MUS_DP_SOLACEON_DAY) \
+    X(MUS_DP_ROUTE225_DAY) \
+    X(MUS_DP_VALOR_LAKEFRONT_DAY) \
+    X(MUS_DP_JUBILIFE_DAY) \
+    X(MUS_DP_CANALAVE_DAY) \
+    X(MUS_DP_OREBURGH_DAY) \
+    X(MUS_DP_ETERNA_DAY) \
+    X(MUS_DP_HEARTHOME_DAY) \
+    X(MUS_DP_VEILSTONE_DAY) \
+    X(MUS_DP_SUNYSHORE_DAY) \
+    X(MUS_DP_SNOWPOINT_DAY) \
+    X(MUS_DP_POKEMON_LEAGUE_DAY) \
+    X(MUS_DP_FIGHT_AREA_DAY) \
+    X(MUS_DP_ROUTE201_DAY) \
+    X(MUS_DP_ROUTE203_DAY) \
+    X(MUS_DP_ROUTE205_DAY) \
+    X(MUS_DP_ROUTE206_DAY) \
+    X(MUS_DP_ROUTE209_DAY) \
+    X(MUS_DP_ROUTE210_DAY) \
+    X(MUS_DP_ROUTE216_DAY) \
+    X(MUS_DP_ROUTE228_DAY) \
+    X(MUS_DP_ROWAN) \
+    X(MUS_DP_TV_BROADCAST) \
+    X(MUS_DP_TWINLEAF_NIGHT) \
+    X(MUS_DP_SANDGEM_NIGHT) \
+    X(MUS_DP_FLOAROMA_NIGHT) \
+    X(MUS_DP_SOLACEON_NIGHT) \
+    X(MUS_DP_ROUTE225_NIGHT) \
+    X(MUS_DP_VALOR_LAKEFRONT_NIGHT) \
+    X(MUS_DP_JUBILIFE_NIGHT) \
+    X(MUS_DP_CANALAVE_NIGHT) \
+    X(MUS_DP_OREBURGH_NIGHT) \
+    X(MUS_DP_ETERNA_NIGHT) \
+    X(MUS_DP_HEARTHOME_NIGHT) \
+    X(MUS_DP_VEILSTONE_NIGHT) \
+    X(MUS_DP_SUNYSHORE_NIGHT) \
+    X(MUS_DP_SNOWPOINT_NIGHT) \
+    X(MUS_DP_POKEMON_LEAGUE_NIGHT) \
+    X(MUS_DP_FIGHT_AREA_NIGHT) \
+    X(MUS_DP_ROUTE201_NIGHT) \
+    X(MUS_DP_ROUTE203_NIGHT) \
+    X(MUS_DP_ROUTE205_NIGHT) \
+    X(MUS_DP_ROUTE206_NIGHT) \
+    X(MUS_DP_ROUTE209_NIGHT) \
+    X(MUS_DP_ROUTE210_NIGHT) \
+    X(MUS_DP_ROUTE216_NIGHT) \
+    X(MUS_DP_ROUTE228_NIGHT) \
+    X(MUS_DP_UNDERGROUND) \
+    X(MUS_DP_FLAG_CAPTURED) \
+    X(MUS_DP_VICTORY_ROAD) \
+    X(MUS_DP_ETERNA_FOREST) \
+    X(MUS_DP_OLD_CHATEAU) \
+    X(MUS_DP_LAKE_CAVERNS) \
+    X(MUS_DP_AMITY_SQUARE) \
+    X(MUS_DP_GALACTIC_HQ) \
+    X(MUS_DP_GALACTIC_ETERNA_BUILDING) \
+    X(MUS_DP_GREAT_MARSH) \
+    X(MUS_DP_LAKE) \
+    X(MUS_DP_MT_CORONET) \
+    X(MUS_DP_SPEAR_PILLAR) \
+    X(MUS_DP_STARK_MOUNTAIN) \
+    X(MUS_DP_OREBURGH_GATE) \
+    X(MUS_DP_OREBURGH_MINE) \
+    X(MUS_DP_INSIDE_POKEMON_LEAGUE) \
+    X(MUS_DP_HALL_OF_FAME_ROOM) \
+    X(MUS_DP_POKE_CENTER) \
+    X(MUS_DP_POKE_CENTER_NIGHT) \
+    X(MUS_DP_GYM) \
+    X(MUS_DP_ROWAN_LAB) \
+    X(MUS_DP_CONTEST_LOBBY) \
+    X(MUS_DP_POKE_MART) \
+    X(MUS_DP_GAME_CORNER) \
+    X(MUS_DP_B_TOWER) \
+    X(MUS_DP_TV_STATION) \
+    X(MUS_DP_GALACTIC_HQ_BASEMENT) \
+    X(MUS_DP_AZURE_FLUTE) \
+    X(MUS_DP_HALL_OF_ORIGIN) \
+    X(MUS_DP_GTS) \
+    X(MUS_DP_ENCOUNTER_BOY) \
+    X(MUS_DP_ENCOUNTER_TWINS) \
+    X(MUS_DP_ENCOUNTER_INTENSE) \
+    X(MUS_DP_ENCOUNTER_GALACTIC) \
+    X(MUS_DP_ENCOUNTER_LADY) \
+    X(MUS_DP_ENCOUNTER_HIKER) \
+    X(MUS_DP_ENCOUNTER_RICH) \
+    X(MUS_DP_ENCOUNTER_SAILOR) \
+    X(MUS_DP_ENCOUNTER_SUSPICIOUS) \
+    X(MUS_DP_ENCOUNTER_ACE_TRAINER) \
+    X(MUS_DP_ENCOUNTER_GIRL) \
+    X(MUS_DP_ENCOUNTER_CYCLIST) \
+    X(MUS_DP_ENCOUNTER_ARTIST) \
+    X(MUS_DP_ENCOUNTER_ELITE_FOUR) \
+    X(MUS_DP_ENCOUNTER_CHAMPION) \
+    X(MUS_DP_VS_WILD) \
+    X(MUS_DP_VS_GYM_LEADER) \
+    X(MUS_DP_VS_UXIE_MESPRIT_AZELF) \
+    X(MUS_DP_VS_TRAINER) \
+    X(MUS_DP_VS_GALACTIC_BOSS) \
+    X(MUS_DP_VS_DIALGA_PALKIA) \
+    X(MUS_DP_VS_CHAMPION) \
+    X(MUS_DP_VS_GALACTIC) \
+    X(MUS_DP_VS_RIVAL) \
+    X(MUS_DP_VS_ARCEUS) \
+    X(MUS_DP_VS_LEGEND) \
+    X(MUS_DP_VICTORY_WILD) \
+    X(MUS_DP_VICTORY_TRAINER) \
+    X(MUS_DP_VICTORY_GYM_LEADER) \
+    X(MUS_DP_VICTORY_CHAMPION) \
+    X(MUS_DP_VICTORY_GALACTIC) \
+    X(MUS_DP_VICTORY_ELITE_FOUR) \
+    X(MUS_DP_VS_GALACTIC_COMMANDER) \
+    X(MUS_DP_CONTEST) \
+    X(MUS_DP_VS_ELITE_FOUR) \
+    X(MUS_DP_FOLLOW_ME) \
+    X(MUS_DP_RIVAL) \
+    X(MUS_DP_LAKE_EVENT) \
+    X(MUS_DP_EVOLUTION) \
+    X(MUS_DP_LUCAS) \
+    X(MUS_DP_DAWN) \
+    X(MUS_DP_LEGEND_APPEARS) \
+    X(MUS_DP_CATASTROPHE) \
+    X(MUS_DP_POKE_RADAR) \
+    X(MUS_DP_SURF) \
+    X(MUS_DP_CYCLING) \
+    X(MUS_DP_LETS_GO_TOGETHER) \
+    X(MUS_DP_TV_END) \
+    X(MUS_DP_LEVEL_UP) \
+    X(MUS_DP_EVOLVED) \
+    X(MUS_DP_OBTAIN_KEY_ITEM) \
+    X(MUS_DP_OBTAIN_ITEM) \
+    X(MUS_DP_CAUGHT_INTRO) \
+    X(MUS_DP_DEX_RATING) \
+    X(MUS_DP_OBTAIN_BADGE) \
+    X(MUS_DP_POKETCH) \
+    X(MUS_DP_OBTAIN_TMHM) \
+    X(MUS_DP_OBTAIN_ACCESSORY) \
+    X(MUS_DP_MOVE_DELETED) \
+    X(MUS_DP_HEAL) \
+    X(MUS_DP_OBTAIN_BERRY) \
+    X(MUS_DP_CONTEST_DRESS_UP) \
+    X(MUS_DP_HALL_OF_FAME) \
+    X(MUS_DP_INTRO) \
+    X(MUS_DP_TITLE) \
+    X(MUS_DP_MYSTERY_GIFT) \
+    X(MUS_DP_WFC) \
+    X(MUS_DP_DANCE_EASY) \
+    X(MUS_DP_DANCE_DIFFICULT) \
+    X(MUS_DP_CONTEST_RESULTS) \
+    X(MUS_DP_CONTEST_WINNER) \
+    X(MUS_DP_POFFINS) \
+    X(MUS_DP_SLOTS_WIN) \
+    X(MUS_DP_SLOTS_JACKPOT) \
+    X(MUS_DP_CREDITS) \
+    X(MUS_DP_SLOTS_UNUSED) \
+    X(MUS_PL_FIGHT_AREA_DAY) \
+    X(MUS_PL_TV_BROADCAST) \
+    X(MUS_PL_TV_END) \
+    X(MUS_PL_INTRO) \
+    X(MUS_PL_TITLE) \
+    X(MUS_PL_DISTORTION_WORLD) \
+    X(MUS_PL_B_ARCADE) \
+    X(MUS_PL_B_HALL) \
+    X(MUS_PL_B_CASTLE) \
+    X(MUS_PL_B_FACTORY) \
+    X(MUS_PL_GLOBAL_TERMINAL) \
+    X(MUS_PL_LILYCOVE_BOSSA_NOVA) \
+    X(MUS_PL_LOOKER) \
+    X(MUS_PL_VS_GIRATINA) \
+    X(MUS_PL_VS_FRONTIER_BRAIN) \
+    X(MUS_PL_VICTORY_FRONTIER_BRAIN) \
+    X(MUS_PL_VS_REGI) \
+    X(MUS_PL_CONTEST_COOL) \
+    X(MUS_PL_CONTEST_SMART) \
+    X(MUS_PL_CONTEST_CUTE) \
+    X(MUS_PL_CONTEST_TOUGH) \
+    X(MUS_PL_CONTEST_BEAUTY) \
+    X(MUS_PL_SPIN_TRADE) \
+    X(MUS_PL_WIFI_MINIGAMES) \
+    X(MUS_PL_WIFI_PLAZA) \
+    X(MUS_PL_WIFI_PARADE) \
+    X(MUS_PL_GIRATINA_APPEARS_1) \
+    X(MUS_PL_GIRATINA_APPEARS_2) \
+    X(MUS_PL_MYSTERY_GIFT) \
+    X(MUS_PL_TWINLEAF_MUSIC_BOX) \
+    X(MUS_PL_OBTAIN_ARCADE_POINTS) \
+    X(MUS_PL_OBTAIN_CASTLE_POINTS) \
+    X(MUS_PL_OBTAIN_B_POINTS) \
+    X(MUS_PL_WIN_MINIGAME) \
+    X(MUS_HG_E_DENDOURIRI) \
+    X(MUS_HG_NEW_BARK) \
+    X(MUS_HG_CHERRYGROVE) \
+    X(MUS_HG_VIOLET) \
+    X(MUS_HG_AZALEA) \
+    X(MUS_HG_GOLDENROD) \
+    X(MUS_HG_ECRUTEAK) \
+    X(MUS_HG_CIANWOOD) \
+    X(MUS_HG_DANCE_THEATER) \
+    X(MUS_HG_SPROUT_TOWER) \
+    X(MUS_HG_UNION_CAVE) \
+    X(MUS_HG_RUINS_OF_ALPH) \
+    X(MUS_HG_NATIONAL_PARK) \
+    X(MUS_HG_BURNED_TOWER) \
+    X(MUS_HG_BELL_TOWER) \
+    X(MUS_HG_LIGHTHOUSE) \
+    X(MUS_HG_TEAM_ROCKET_HQ) \
+    X(MUS_HG_ICE_PATH) \
+    X(MUS_HG_DRAGONS_DEN) \
+    X(MUS_HG_POKEMON_LEAGUE) \
+    X(MUS_HG_FOLLOW_ME_1) \
+    X(MUS_HG_FOLLOW_ME_2) \
+    X(MUS_HG_ENCOUNTER_RIVAL) \
+    X(MUS_HG_RIVAL_EXIT) \
+    X(MUS_HG_BUG_CONTEST_PREP) \
+    X(MUS_HG_BUG_CATCHING_CONTEST) \
+    X(MUS_HG_ROCKET_TAKEOVER) \
+    X(MUS_HG_MAGNET_TRAIN) \
+    X(MUS_HG_EUSINE) \
+    X(MUS_HG_CLAIR) \
+    X(MUS_HG_ENCOUNTER_GIRL_1) \
+    X(MUS_HG_ENCOUNTER_BOY_1) \
+    X(MUS_HG_ENCOUNTER_SUSPICIOUS_1) \
+    X(MUS_HG_ENCOUNTER_SAGE) \
+    X(MUS_HG_ENCOUNTER_KIMONO_GIRL) \
+    X(MUS_HG_ENCOUNTER_ROCKET) \
+    X(MUS_HG_ENCOUNTER_SUSPICIOUS_2) \
+    X(MUS_HG_VS_GYM_LEADER) \
+    X(MUS_HG_VS_RIVAL) \
+    X(MUS_HG_VS_ROCKET) \
+    X(MUS_HG_VS_RAIKOU) \
+    X(MUS_HG_VS_CHAMPION) \
+    X(MUS_HG_VS_HO_OH) \
+    X(MUS_HG_VS_LUGIA) \
+    X(MUS_HG_ETHAN) \
+    X(MUS_HG_LYRA) \
+    X(MUS_HG_KIMONO_GIRL_DANCE) \
+    X(MUS_HG_KIMONO_GIRL) \
+    X(MUS_HG_HO_OH_APPEARS) \
+    X(MUS_HG_LUGIA_APPEARS) \
+    X(MUS_BW12_001) \
+	X(MUS_BW12_002) \
+	X(MUS_BW12_003) \
+	X(MUS_BW12_004) \
+	X(MUS_BW12_005) \
+	X(MUS_BW12_006) \
+	X(MUS_BW12_007) \
+	X(MUS_BW12_008) \
+	X(MUS_BW12_009) \
+	X(MUS_BW12_VS_ELITE_FOUR) \
+	X(MUS_BW12_VS_CHEREN_BIANCA) \
+	X(MUS_BW12_VS_WILD_STRONG) \
+	X(MUS_BW12_013) \
+	X(MUS_BW12_014) \
+	X(MUS_BW12_015) \
+	X(MUS_BW12_016) \
+	X(MUS_BW12_GYM) \
+	X(MUS_BW12_UNWAVERING_EMOTIONS) \
+	X(MUS_BW12_THE_POKEMON_1) \
+	X(MUS_BW12_TITLE_SCREEN) \
+	X(MUS_BW12_021) \
+	X(MUS_BW12_022) \
+	X(MUS_BW12_023) \
+	X(MUS_BW12_024) \
+	X(MUS_BW12_025) \
+	X(MUS_BW12_026) \
+	X(MUS_BW12_027) \
+	X(MUS_BW12_028) \
+	X(MUS_BW12_029) \
+	X(MUS_BW12_030) \
+	X(MUS_BW12_031) \
+	X(MUS_BW12_032) \
+	X(MUS_BW12_033) \
+	X(MUS_BW12_ROUTE_2) \
+	X(MUS_BW12_035) \
+	X(MUS_BW12_036) \
+	X(MUS_BW12_VS_GYM_LEADER_1) \
+	X(MUS_BW12_VS_TRAINER_1) \
+	X(MUS_BW12_VS_WILD_1) \
+	X(MUS_BW12_VS_ALDER) \
+	X(MUS_BW12_041) \
+	X(MUS_BW12_042) \
+	X(MUS_BW12_043) \
+	X(MUS_BW12_POKEMON_CENTER) \
+	X(MUS_BW12_045) \
+	X(MUS_BW12_046) \
+	X(MUS_BW12_047) \
+	X(MUS_BW12_048) \
+	X(MUS_BW12_049) \
+	X(MUS_BW12_050) \
+	X(MUS_BW12_051) \
+	X(MUS_BW12_052) \
+	X(MUS_BW12_053) \
+	X(MUS_BW12_054) \
+	X(MUS_BW12_055) \
+	X(MUS_BW12_056) \
+	X(MUS_BW12_057) \
+	X(MUS_BW12_058) \
+	X(MUS_BW12_059) \
+	X(MUS_BW12_GAMEFREAK) \
+	X(MUS_BW12_061) \
+	X(MUS_BW12_062) \
+	X(MUS_BW12_063) \
+	X(MUS_BW12_064) \
+	X(MUS_BW12_065) \
+	X(MUS_BW12_066) \
+	X(MUS_BW12_067) \
+	X(MUS_BW12_068) \
+	X(MUS_BW12_069) \
+	X(MUS_BW12_070) \
+	X(MUS_BW12_071) \
+	X(MUS_BW12_072) \
+	X(MUS_BW12_073) \
+	X(MUS_BW12_VS_ZEKROM) \
+	X(MUS_BW12_VS_RESHIRAM) \
+	X(MUS_BW12_VS_LEGENDARY) \
+	X(MUS_BW12_077) \
+	X(MUS_BW12_078) \
+	X(MUS_BW12_VS_PWC_FINAL) \
+	X(MUS_BW12_080) \
+	X(MUS_BW12_081) \
+	X(MUS_BW12_VS_TRAINER_SUBWAY) \
+	X(MUS_BW12_VS_N) \
+	X(MUS_BW12_VS_GHETSIS_1) \
+	X(MUS_BW12_085) \
+	X(MUS_BW12_086) \
+	X(MUS_BW12_087) \
+	X(MUS_BW12_088) \
+	X(MUS_BW12_BLACK_CITY) \
+	X(MUS_BW12_WHITE_FOREST) \
+	X(MUS_BW12_091) \
+	X(MUS_BW12_092) \
+	X(MUS_BW12_VS_GYM_LEADER_WINNING_1) \
+	X(MUS_BW12_094) \
+	X(MUS_BW12_095) \
+	X(MUS_BW12_096) \
+	X(MUS_BW12_097) \
+	X(MUS_BW12_098) \
+	X(MUS_BW12_099) \
+	X(MUS_BW12_100) \
+	X(MUS_BW12_101) \
+	X(MUS_BW12_102) \
+	X(MUS_BW12_103) \
+	X(MUS_BW12_104) \
+	X(MUS_BW12_105) \
+	X(MUS_BW12_106) \
+	X(MUS_BW12_107) \
+	X(MUS_BW12_VS_IN_DANGER) \
+	X(MUS_BW12_109) \
+	X(MUS_BW12_110) \
+	X(MUS_BW12_111) \
+	X(MUS_BW12_112) \
+	X(MUS_BW12_113) \
+	X(MUS_BW12_114) \
+	X(MUS_BW12_VS_N_DECISIVE_BATTLE) \
+	X(MUS_BW12_116) \
+	X(MUS_BW12_117) \
+	X(MUS_BW12_118) \
+	X(MUS_BW12_119) \
+	X(MUS_BW12_120) \
+	X(MUS_BW12_121) \
+	X(MUS_BW12_CYNTIA_INTRO) \
+	X(MUS_BW12_VS_CYNTIA) \
+	X(MUS_BW12_124) \
+	X(MUS_BW12_VS_WILD_2) \
+	X(MUS_BW12_VS_TRAINER_2) \
+	X(MUS_BW12_127) \
+	X(MUS_BW12_VS_GYM_LEADER_2) \
+	X(MUS_BW12_VS_PLASMA_GRUNT_2) \
+	X(MUS_BW12_130) \
+	X(MUS_BW12_131) \
+	X(MUS_BW12_VS_COLRESS) \
+	X(MUS_BW12_VS_HUGH) \
+	X(MUS_BW12_134) \
+	X(MUS_BW12_135) \
+	X(MUS_BW12_ENTRALINK) \
+	X(MUS_BW12_137) \
+	X(MUS_BW12_OPENING_2) \
+	X(MUS_BW12_THE_POKEMON_2) \
+	X(MUS_BW12_140) \
+	X(MUS_BW12_141) \
+	X(MUS_BW12_VS_GHETSIS_2) \
+	X(MUS_BW12_VS_BW_KYUREM) \
+	X(MUS_BW12_144) \
+	X(MUS_BW12_145) \
+	X(MUS_BW12_146) \
+	X(MUS_BW12_147) \
+	X(MUS_BW12_148) \
+	X(MUS_BW12_VS_PWT_FINAL) \
+	X(MUS_BW12_150) \
+	X(MUS_BW12_151) \
+	X(MUS_BW12_152) \
+	X(MUS_BW12_153) \
+	X(MUS_BW12_VS_REGI) \
+	X(MUS_BW12_REGI_CHAMBER) \
+	X(MUS_BW12_VS_PLASMA_GRUNT_1) \
+	X(MUS_BW12_PWT) \
+	X(MUS_BW12_VS_PWT_KANTO_LEADER) \
+	X(MUS_BW12_VS_PWT_KANTO_CHAMPION) \
+	X(MUS_BW12_VS_PWT_JOHTO_LEADER) \
+	X(MUS_BW12_VS_PWT_JOHTO_CHAMPION) \
+	X(MUS_BW12_VS_PWT_HOENN_LEADER) \
+	X(MUS_BW12_VS_PWT_HOENN_CHAMPION) \
+	X(MUS_BW12_VS_PWT_SINNOH_LEADER) \
+	X(MUS_BW12_VS_PWT_SINNOH_CHAMPION) \
+	X(MUS_BW12_VS_IRIS) \
+	X(MUS_BW12_167) \
+	X(MUS_BW12_168) \
+	X(MUS_BW12_169) \
+	X(MUS_BW12_VS_GYM_LEADER_WINNING_2) \
+	X(MUS_BW12_171) \
+	X(MUS_BW12_172) \
+	X(MUS_BW12_173) \
+	X(MUS_BW12_174) \
+	X(MUS_BW12_POKEWOOD) \
+	X(MUS_BW12_176) \
+	X(MUS_BW12_177) \
+	X(MUS_BW12_178) \
+	X(MUS_BW12_179) \
+	X(MUS_BW12_180) \
+	X(MUS_BW12_181) \
+	X(MUS_BW12_GYM_MISTRALTON) \
+	X(MUS_BW12_GYM_OPELUCID) \
+	X(MUS_BW12_ASSAULT_OPELUCID_CITY) \
+	X(MUS_BW12_FROZEN_TOWN) \
+	X(MUS_BW12_186) \
+	X(MUS_BW12_187) \
+	X(MUS_BW12_188) \
+	X(MUS_BW12_189) \
+	X(MUS_BW12_190) \
+	X(MUS_BW12_191) \
+	X(MUS_BW12_192) \
+	X(MUS_BW12_193) \
+	X(MUS_BW12_GYM_VIRBANK) \
+	X(MUS_BW12_195) \
+	X(MUS_BW12_196) \
+	X(MUS_BW12_197) \
+	X(MUS_BW12_GYM_HUMILAU) \
+	X(MUS_BW12_199) \
+	X(MUS_BW12_GYM_NIMBASA_RUNAWAY) \
+	X(MUS_BW12_GYM_NIMBASA_STAGE) \
+	X(MUS_BW12_SPOTTED_BEAUTY) \
+	X(MUS_BW12_CREDITS) \
+	X(MUS_BW12_CREDITS_END) \
+	X(MUS_BW12_PWT_VENUE)
 
 #define SOUND_LIST_SE               \
     X(SE_USE_ITEM)                  \

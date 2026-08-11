@@ -311,7 +311,7 @@ And then the scripto handle the player having successfully received a mon:
 ```
 MysteryGift_EventScript_ReceivedMon::
 	msgbox MysteryGift_Text_SucceededText, MSGBOX_DEFAULT
-	playfanfare MUS_OBTAIN_ITEM
+	playfanfare MUS_DP_OBTAIN_ITEM
 	message MysteryGift_Text_ReceivedGiftMon
 	waitfanfare
     goto_if_eq VAR_RESULT, MON_GIVEN_TO_PARTY, MysteryGift_EventScript_NicknamePartyMon

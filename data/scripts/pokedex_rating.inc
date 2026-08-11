@@ -27,7 +27,7 @@ PokedexRating_EventScript_NormalFanfare::
 	return
 
 PokedexRating_EventScript_DexCompleteFanfare::
-	playfanfare MUS_EVOLVED
+	playfanfare MUS_DP_EVOLVED
 	return
 
 PokedexRating_EventScript_Rate::

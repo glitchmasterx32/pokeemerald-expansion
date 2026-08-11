@@ -101,7 +101,7 @@ FourIsland_EventScript_DaycareReceivedEgg::
 	textcolor NPC_TEXT_COLOR_NEUTRAL
 	message DayCare_Text_ReceivedEgg
 	call EventScript_RestorePrevTextColor
-	playfanfare MUS_LEVEL_UP
+	playfanfare MUS_DP_LEVEL_UP
 	waitfanfare
 	waitbuttonpress
 	msgbox DayCare_Text_TakeGoodCareOfIt

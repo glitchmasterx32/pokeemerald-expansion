@@ -63,7 +63,7 @@ BattleFrontier_BattleTowerBattleRoom_EventScript_DefeatedOpponent::
 	applymovement LOCALID_PLAYER, BattleFrontier_BattleTowerBattleRoom_Movement_PlayerFaceAttendant
 	waitmovement 0
 	msgbox BattleFrontier_BattleTowerBattleRoom_Text_RestoreMonsToFullHealth, MSGBOX_DEFAULT
-	playfanfare MUS_HEAL
+	playfanfare MUS_DP_HEAL
 	waitfanfare
 	special HealPlayerParty
 BattleFrontier_BattleTowerBattleRoom_EventScript_AskReadyForOpponent::
